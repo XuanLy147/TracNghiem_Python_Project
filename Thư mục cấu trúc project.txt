@@ -1,0 +1,29 @@
+tracnghiem_python_project/ ( Cái này dùng streamlit để chạy web)
+│
+├── database/                          # Quản lý cơ sở dữ liệu
+│   └── init_db.sql                    # Script tạo DB và 120 câu hỏi mẫu đã chốt
+│
+├── shared/                            # Thư mục chứa mã nguồn dùng chung
+│   ├── __init__.py
+│   └── db.py                          # Logic kết nối MySQL (Admin và Web dùng chung để tránh trùng lặp)
+│
+├── admin_app/                         # ỨNG DỤNG LOCAL ĐỒ HỌA (Dành cho Admin)
+│   ├── main.py                        # File khởi chạy chính của ứng dụng Admin
+│   ├── ui/                            # Nơi thiết kế giao diện (Tkinter / CustomTkinter / PyQt)
+│   │   ├── __init__.py
+│   │   ├── login_ui.py                # Giao diện Đăng nhập Admin
+│   │   ├── student_ui.py              # Giao diện Quản lý học viên & Xem lịch sử thi
+│   │   └── question_ui.py             # Giao diện Quản lý môn, Danh sách câu hỏi (Thêm/Sửa/Xóa)
+│   └── utils/
+│       ├── __init__.py
+│       └── excel_handler.py           # Logic dùng pandas đọc file Excel (6 cột) để nạp vào DB
+│
+├── web_app/                           # TRANG WEB HỆ THỐNG (Dành cho Học sinh bằng Streamlit)
+│   ├── app.py                         # File chạy chính (Đồng thời là trang Đăng nhập / Dashboard chính)
+│   └── pages/                         # Tính năng Multi-page (Nhiều trang) mặc định của Streamlit
+│       ├── 1_Đăng_Ký.py               # Giao diện + Logic Đăng ký tài khoản học sinh
+│       ├── 2_Làm_Bài_Thi.py           # Giao diện Chọn môn/Độ khó -> Làm bài -> Chấm điểm tô màu Xanh/Đỏ
+│       └── 3_Lịch_Sử_Làm_Bài.py       # Giao diện Xem lại lịch sử các lượt thi của học sinh đó
+│
+├── requirements.txt                   # Các thư viện cần cài đặt (pandas, streamlit, mysql-connector...)
+└── README.md                          # Hướng dẫn cách config DB và chạy các lệnh terminal

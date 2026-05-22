@@ -1,0 +1,13 @@
+# --- Web App (Giao diện cho Học sinh) ---
+streamlit
+
+# --- Admin App (Xử lý file Excel) ---
+pandas
+openpyxl
+
+# --- Database & Bảo mật (Dùng chung) ---
+mysql-connector-python
+bcrypt
+
+lệnh cài các thư viện nếu đã có python 
+pip install mysql-connector-python streamlit pandas openpyxl bcrypt

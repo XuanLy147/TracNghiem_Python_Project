@@ -1,0 +1,72 @@
+# LỘ TRÌNH CODE PROJECT TRẮC NGHIỆM PYTHON (MVP)
+
+=======================================================
+PHASE 1: XÂY DỰNG NỀN TẢNG (DATABASE & KẾT NỐI)
+=======================================================
+Mục tiêu: Đảm bảo Python nói chuyện được với MySQL thành công.
+
+[ ] 1. database/tracnghiem_python.sql
+    - Chạy file này trong MySQL (phpMyAdmin hoặc MySQL Workbench) để tạo cấu trúc 6 bảng và nạp 120 câu hỏi mẫu.
+    - Test thử các câu lệnh SELECT cơ bản trong MySQL để đảm bảo dữ liệu đã vào.
+
+[ ] 2. shared/db.py
+    - Code các hàm kết nối cơ bản dùng mysql-connector-python.
+    - Viết 3 hàm dùng chung lõi:
+        + get_connection(): Mở kết nối đến DB `tracnghiem_python`.
+        + fetch_data(query, params): Dùng cho lệnh SELECT.
+        + execute_query(query, params): Dùng cho lệnh INSERT, UPDATE, DELETE.
+    - Test chạy độc lập file này xem có in ra được "Kết nối thành công" không.
+
+=======================================================
+PHASE 2: TRANG WEB HỌC SINH (STREAMLIT)
+=======================================================
+Mục tiêu: Hoàn thiện luồng cho Học sinh (Đăng ký -> Đăng nhập -> Thi -> Lịch sử).
+
+[ ] 3. web_app/app.py (Trang chủ & Đăng nhập)
+    - Code giao diện đăng nhập bằng Streamlit (st.text_input cho username/password).
+    - Code logic băm mật khẩu (bcrypt) và đối chiếu với bảng `students`.
+    - Thiết lập biến trạng thái (st.session_state) để lưu thông tin user khi đăng nhập thành công.
+
+[ ] 4. web_app/pages/Dang_Ki.py
+    - Giao diện form: Username, Password, Full Name.
+    - Logic: Băm password và INSERT vào bảng `students`. Xử lý lỗi nếu username bị trùng.
+
+[ ] 5. web_app/pages/Lam_Bai_Thi.py (Module quan trọng nhất)
+    - Bước 5.1: Làm form chọn Môn học (SELECT từ bảng subjects) và Độ khó.
+    - Bước 5.2: Viết query lấy ra N câu hỏi ngẫu nhiên (ORDER BY RAND()).
+    - Bước 5.3: Hiển thị câu hỏi lên màn hình bằng st.radio (xáo trộn vị trí 4 đáp án A, B, C, D).
+    - Bước 5.4: Nút "Nộp bài" -> So sánh đáp án học sinh chọn với `correct_option`.
+    - Bước 5.5: Hiển thị kết quả (Dùng st.success màu xanh cho câu đúng, st.error màu đỏ cho câu sai).
+    - Bước 5.6: Lưu thông tin vào bảng `quiz_attempts` và `attempt_details`.
+
+[ ] 6. web_app/pages/Lich_Su_Lam_Bai.py
+    - Lấy student_id từ session_state.
+    - SELECT từ `quiz_attempts` để show ra bảng (st.dataframe hoặc st.table) các lần thi trước đó (Ngày thi, Môn, Điểm).
+
+=======================================================
+PHASE 3: APP LOCAL ADMIN (XỬ LÝ DỮ LIỆU & UI)
+=======================================================
+Mục tiêu: Xây dựng tool cho Admin quản lý hệ thống.
+
+[ ] 7. admin_app/utils/excel_handler.py (Xử lý nghiệp vụ lõi)
+    - Code hàm dùng `pandas` đọc file Excel gồm 6 cột.
+    - Viết vòng lặp duyệt từng dòng, mapping với subject_id và difficulty_level, sau đó dùng hàm trong `shared/db.py` để INSERT vào bảng `questions`.
+    - Test độc lập file này với một file Excel mẫu nhỏ.
+
+[ ] 8. admin_app/ui/login_ui.py
+    - Dựng cửa sổ đăng nhập bằng Tkinter / CustomTkinter.
+    - So khớp tài khoản với bảng `admins`. Đăng nhập thành công thì đóng cửa sổ này và mở giao diện chính.
+
+[ ] 9. admin_app/ui/question_ui.py
+    - Dựng giao diện quản lý Câu hỏi & Môn học.
+    - Chức năng 1: Bảng hiển thị danh sách câu hỏi hiện có.
+    - Chức năng 2: Nút "Import Excel". Cho phép Admin chọn file trên máy, chọn Môn, chọn Độ khó, rồi gọi hàm ở bước 7 để chạy nạp dữ liệu.
+
+[ ] 10. admin_app/ui/student_ui.py
+    - Dựng giao diện quản lý Học viên.
+    - Bảng danh sách học viên (SELECT từ `students`).
+    - Các nút CRUD: Thêm học viên mới (phòng hờ admin muốn tạo tay), Xóa học viên.
+    - Nút "Xem chi tiết": Bấm vào để xổ ra lịch sử thi của học viên đó (lấy từ `quiz_attempts`).
+
+[ ] 11. admin_app/main.py
+    - File root để gọi `login_ui.py`. Mọi thứ của Admin sẽ bắt đầu chạy từ file này.

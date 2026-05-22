@@ -1,0 +1,15 @@
+Những chức năng
+
+Hệ thống
+Đăng nhập 
+Quản lý học viên ( thêm, sửa, xóa, xem lịch sử thi)
+Quản lý môn ( import file đề từ excel, sửa, xóa, thêm bộ đề( bao gồm các mức độ ( dễ, trung bình, khó)))
+Xem bảng danh sách câu hỏi(thêm, sửa, xóa) 
+
+Web
+Đăng nhập
+Đăng kí
+Chọn môn muốn kiểm tra -> chọn mức độ đề (dễ, trung bình, khó) + số lượng câu hỏi -> Xem điểm và các câu trả lời(đánh xanh đỏ câu đúng sai)
+Xem lại lịch sử trả lời  
+
+Web làm kiểu hiển thị toàn bộ câu hỏi trong 1 trang, không chia làm nhiều mảnh khác nhau r nhấn nút
