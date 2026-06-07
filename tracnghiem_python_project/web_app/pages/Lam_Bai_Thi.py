@@ -522,7 +522,7 @@ elif st.session_state.quiz_phase == "results":
         if st.button("🏠 Quay lại Trang chủ", use_container_width=True):
             st.session_state.quiz_phase = "setup"
             st.session_state.user_answers = {}
-            st.rerun()
+            st.switch_page("app.py")
     with col2:
         if st.button("📚 Làm bài khác", use_container_width=True):
             st.session_state.quiz_phase = "setup"
