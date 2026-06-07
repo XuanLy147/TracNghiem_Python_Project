@@ -4,6 +4,8 @@ Chạy bằng: streamlit run web_app/app.py
 """
 
 import streamlit as st
+import admin_app.utils.excel_handler as excel_handler
+import tempfile
 import sys
 import os
 
@@ -123,6 +125,35 @@ def show_dashboard():
         if st.button("Xem Lịch Sử 🕒", key="btn_su", use_container_width=True):
             st.switch_page("pages/Lich_Su_Lam_Bai.py")
     with m3: st.markdown('<div class="menu-card"><div class="menu-icon">👤</div><div class="menu-title">Tài Khoản</div><div class="menu-desc">Thông tin cá nhân</div></div>', unsafe_allow_html=True)
+
+    # --- NÚT THÊM EXCEL ---
+    st.markdown("---")
+    st.markdown("<strong style='color:white;'>📂 Thêm câu hỏi từ file Excel</strong>", unsafe_allow_html=True)
+    
+    uploaded_file = st.file_uploader("Vui lòng chọn file Excel", type=['xls', 'xlsx'])
+    
+    if uploaded_file is not None:
+        if st.button("🚀 Tiến hành thêm vào Database", use_container_width=True):
+            with st.spinner("Đang thêm dữ liệu từ file Excel..."):
+                try:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
+                        tmp.write(uploaded_file.getvalue())
+                        tmp_file_path = tmp.name
+                    
+                    success = excel_handler.import_questions_from_excel(tmp_file_path)
+                    
+                    if success:
+                        st.success("✅ Đã thêm câu hỏi vào Database thành công!")
+                    else:
+                        st.error("❌ Có lỗi xảy ra khi thêm câu hỏi. Vui lòng kiểm tra lại cấu trúc file Excel.")
+                        
+                except Exception as e:
+                    st.error(f"❌ Lỗi hệ thống: {e}")
+                
+                finally:
+                    if 'tmp_file_path' in locals() and os.path.exists(tmp_file_path):
+                        os.remove(tmp_file_path)
+    # ------------------------------
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.info("💡 Dùng thanh menu bên trái để điều hướng đến các trang.", icon="ℹ️")
