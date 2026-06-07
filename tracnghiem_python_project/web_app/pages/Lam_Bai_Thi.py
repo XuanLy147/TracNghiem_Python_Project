@@ -159,7 +159,7 @@ html, body, [class*="css"] { font-family: 'Be Vietnam Pro', sans-serif; color: #
 """, unsafe_allow_html=True)
 
 
-if "student_id" not in st.session_state or st.session_state.student_id is None:
+if not st.session_state.logged_in or st.session_state.student is None:
     st.warning("⚠️ Vui lòng đăng nhập trước khi làm bài thi.")
     if st.button("🔐 Quay lại Đăng nhập"):
         st.switch_page("app.py")
@@ -220,7 +220,7 @@ def get_last_attempt_id(student_id: int, subject_id: int):
 
 def save_attempt_detail(attempt_id: int, question_id: int, selected_option: str, is_correct: bool):
     query = """
-    INSERT INTO attempt_details (attempt_id, question_id, selected_option, is_correct)
+    INSERT INTO attempt_details (attempt_id, question_id, student_choice, is_correct)
     VALUES (%s, %s, %s, %s)
     """
     return execute_query(query, (attempt_id, question_id, selected_option, 1 if is_correct else 0))
@@ -286,6 +286,7 @@ if st.session_state.quiz_phase == "setup":
                 st.session_state.current_question_index = 0
                 st.session_state.bookmarked_questions = []
                 st.session_state.quiz_phase = "taking"
+                st.session_state.has_saved = False
                 st.rerun()
 
 
@@ -473,25 +474,23 @@ elif st.session_state.quiz_phase == "results":
     """, unsafe_allow_html=True)
 
     with st.spinner("Đang lưu kết quả..."):
-        attempt_saved = save_quiz_attempt(
-            st.session_state.student_id,
-            subject_id,
-            difficulty,
-            score,
-            total_q
-        )
-
-        if attempt_saved:
-            attempt_id = get_last_attempt_id(st.session_state.student_id, subject_id)
-            if attempt_id:
-                for result in results_list:
-                    save_attempt_detail(
-                        attempt_id,
-                        result["question_id"],
-                        result["selected"],
-                        result["is_correct"]
-                    )
-                st.success("✅ Kết quả đã được lưu thành công!")
+        student_id = st.session_state.student['student_id']
+        # KIỂM TRA Ổ KHÓA: Nếu chưa lưu (False) thì mới cho lưu
+        if st.session_state.get('has_saved', False) == False:
+            attempt_saved = save_quiz_attempt(student_id, subject_id, difficulty, score, total_q)
+            if attempt_saved:
+                attempt_id = get_last_attempt_id(student_id, subject_id)
+                if attempt_id:
+                    for result in results_list:
+                        short_selected = str(result["selected"])[:250]
+                        save_attempt_detail(attempt_id, result["question_id"], short_selected, result["is_correct"])
+                
+                # KHÓA LẠI: Đánh dấu là đã lưu rồi, cấm lưu thêm!
+                st.session_state.has_saved = True
+                st.success("✅ Kết quả đã được lưu thành công vào Sổ Điểm!")
+        else:
+            # Nếu đã lưu rồi thì web chỉ cần hiện thông báo xanh thôi, không đụng vào Database nữa
+            st.success("✅ Kết quả đã được lưu thành công vào Sổ Điểm!")
 
     st.markdown("<h3 style='color: #0f172a; text-align: center; margin-top: 1.5rem;'>📋 Chi Tiết Bài Làm</h3>", unsafe_allow_html=True)
 

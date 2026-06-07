@@ -16,7 +16,7 @@ st.set_page_config(
     page_title="Hệ Thống Trắc Nghiệm",
     page_icon="📝",
     layout="centered",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
 # ===================== CSS CUSTOM =====================
@@ -29,7 +29,8 @@ html, body, [class*="css"] { font-family: 'Be Vietnam Pro', sans-serif; }
 /* MÀU NỀN TRANG WEB #4ECDC4 */
 .stApp { background: #4ECDC4; min-height: 100vh; }
 
-#MainMenu, header, footer { visibility: hidden; }
+#MainMenu, footer { visibility: hidden; }
+header { background-color: transparent !important; }
 .block-container { padding-top: 2rem !important; }
 .hero-header { text-align: center; padding: 2.5rem 1rem 1.5rem; animation: fadeInDown 0.7s ease; }
 
@@ -113,8 +114,14 @@ def show_dashboard():
     st.markdown("<br><strong style='color:white;'>📌 Chức năng</strong>", unsafe_allow_html=True)
 
     m1, m2, m3 = st.columns(3)
-    with m1: st.markdown('<div class="menu-card"><div class="menu-icon">✍️</div><div class="menu-title">Làm Bài Thi</div><div class="menu-desc">Chọn môn & độ khó</div></div>', unsafe_allow_html=True)
-    with m2: st.markdown('<div class="menu-card"><div class="menu-icon">📊</div><div class="menu-title">Lịch Sử Thi</div><div class="menu-desc">Xem kết quả các lần thi</div></div>', unsafe_allow_html=True)
+    with m1:
+        st.markdown('<div class="menu-card"><div class="menu-icon">✍️</div><div class="menu-title">Làm Bài Thi</div><div class="menu-desc">Chọn môn & độ khó</div></div>', unsafe_allow_html=True)
+        if st.button("Vào Thi", key="btn_thi", use_container_width=True):
+            st.switch_page("pages/Lam_Bai_Thi.py")
+    with m2:
+        st.markdown('<div class="menu-card" style="margin-bottom: 10px;"><div class="menu-icon">📊</div><div class="menu-title">Lịch Sử Thi</div><div class="menu-desc">Xem kết quả các lần thi</div></div>', unsafe_allow_html=True)
+        if st.button("Xem Lịch Sử 🕒", key="btn_su", use_container_width=True):
+            st.switch_page("pages/Lich_Su_Lam_Bai.py")
     with m3: st.markdown('<div class="menu-card"><div class="menu-icon">👤</div><div class="menu-title">Tài Khoản</div><div class="menu-desc">Thông tin cá nhân</div></div>', unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
