@@ -93,11 +93,9 @@ html, body, [class*="css"] { font-family: 'Be Vietnam Pro', sans-serif; color: #
 }
 .stRadio label { font-weight: 600 !important; font-size: 1rem !important; }
 
+/* FIX 2: Bỏ ép buộc màu xanh ở mọi nút để type primary/secondary có tác dụng */
 .stButton > button { 
     width: 100%; 
-    background: #1d4ed8 !important; 
-    color: white !important; 
-    border: none !important; 
     border-radius: 10px !important; 
     font-family: 'Be Vietnam Pro', sans-serif !important; 
     font-weight: 700 !important; 
@@ -150,16 +148,14 @@ html, body, [class*="css"] { font-family: 'Be Vietnam Pro', sans-serif; color: #
 
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-/* Grid button state styling */
-.grid-btn-current .stButton > button { background-color: #1d4ed8 !important; color: white !important; }
-.grid-btn-answered .stButton > button { background-color: #dbeafe !important; color: #0f172a !important;}
-.grid-btn-unanswered .stButton > button { background-color: #ffffff !important; color: #0f172a !important; }
 </style>    
 """, unsafe_allow_html=True)
 
+# FIX 1: Dùng get() để lấy an toàn, tránh lỗi AttributeError khi refresh trang
+is_logged_in = st.session_state.get("logged_in", False)
+current_student = st.session_state.get("student", None)
 
-if not st.session_state.logged_in or st.session_state.student is None:
+if not is_logged_in or current_student is None:
     st.warning("⚠️ Vui lòng đăng nhập trước khi làm bài thi.")
     if st.button("🔐 Quay lại Đăng nhập"):
         st.switch_page("app.py")
@@ -271,7 +267,7 @@ if st.session_state.quiz_phase == "setup":
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        if st.button("🚀 Bắt Đầu Làm Bài", use_container_width=True):
+        if st.button("🚀 Bắt Đầu Làm Bài", type="primary", use_container_width=True):
             subject_id = subject_dict[selected_subject_name]
             questions = get_questions(subject_id, selected_difficulty, num_questions)
 
@@ -317,7 +313,7 @@ elif st.session_state.quiz_phase == "taking":
         """, unsafe_allow_html=True)
     
     with header_col3:
-        if st.button("📤 Nộp Bài", key="header_submit", use_container_width=True):
+        if st.button("📤 Nộp Bài", key="header_submit", type="primary", use_container_width=True):
             st.session_state.quiz_phase = "results"
             st.rerun()
 
@@ -355,16 +351,19 @@ elif st.session_state.quiz_phase == "taking":
 
             current_answer = st.session_state.user_answers.get(question_id)
 
+            # FIX 2: Tự động đổi type của nút thành primary nếu đáp án đó đang được chọn
             for opt_key, opt_text in shuffled_options:
                 btn_text = f"{opt_key}: {opt_text}"
-                if st.button(btn_text, key=f"ans_{question_id}_{opt_key}", use_container_width=True):
+                btn_type = "primary" if current_answer == opt_key else "secondary"
+                
+                if st.button(btn_text, key=f"ans_{question_id}_{opt_key}", type=btn_type, use_container_width=True):
                     st.session_state.user_answers[question_id] = opt_key
                     st.rerun()
 
             is_bookmarked = question_id in st.session_state.bookmarked_questions
             pin_label = "📌 Bỏ Ghim" if is_bookmarked else "📍 Ghim Câu Hỏi"
 
-            if st.button(pin_label, key=f"pin_{question_id}", use_container_width=True):
+            if st.button(pin_label, key=f"pin_{question_id}", type="secondary", use_container_width=True):
                 if is_bookmarked:
                     st.session_state.bookmarked_questions.remove(question_id)
                 else:
@@ -377,6 +376,7 @@ elif st.session_state.quiz_phase == "taking":
         with st.container(border=True):
             st.markdown("<div style='font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 1rem;'>Bảng câu hỏi</div>", unsafe_allow_html=True)
 
+        # FIX 3: Hiển thị bảng câu hỏi chuẩn với Streamlit type và thêm dấu tick ✅
         for row_start in range(0, total_q, 5):
             cols = st.columns(5)
             for col_index in range(5):
@@ -388,19 +388,12 @@ elif st.session_state.quiz_phase == "taking":
                 is_current = (idx == current_idx)
                 is_answered = qid in st.session_state.user_answers
                 
-                # Determine button state class
-                if is_current:
-                    btn_class = "grid-btn-current"      # Xanh đậm
-                elif is_answered:
-                    btn_class = "grid-btn-answered"     # Xanh nhạt
-                else:
-                    btn_class = "grid-btn-unanswered"   # Trắng
+                btn_type = "primary" if is_current else "secondary"
+                btn_label = f"{idx + 1} ✅" if is_answered and not is_current else str(idx + 1)
                 
-                cols[col_index].markdown(f"<div class='{btn_class}'>", unsafe_allow_html=True)
-                if cols[col_index].button(str(idx + 1), key=f"q_nav_{idx}", use_container_width=True):
+                if cols[col_index].button(btn_label, key=f"q_nav_{idx}", type=btn_type, use_container_width=True):
                     st.session_state.current_question_index = idx
                     st.rerun()
-                cols[col_index].markdown("</div>", unsafe_allow_html=True)
 
         st.markdown(f"""
         <div style="background: #f8fafc; border-radius: 16px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; margin: 1rem 0;">
@@ -413,11 +406,11 @@ elif st.session_state.quiz_phase == "taking":
 
         nav_col1, nav_col2 = st.columns(2)
         with nav_col1:
-            if st.button("Trước", key="prev_q", disabled=(current_idx == 0), use_container_width=True):
+            if st.button("Trước", key="prev_q", type="secondary", disabled=(current_idx == 0), use_container_width=True):
                 st.session_state.current_question_index = current_idx - 1
                 st.rerun()
         with nav_col2:
-            if st.button("Tiếp", key="next_q", disabled=(current_idx == total_q - 1), use_container_width=True):
+            if st.button("Tiếp", key="next_q", type="secondary", disabled=(current_idx == total_q - 1), use_container_width=True):
                 st.session_state.current_question_index = current_idx + 1
                 st.rerun()
 
@@ -519,12 +512,12 @@ elif st.session_state.quiz_phase == "results":
 
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("🏠 Quay lại Trang chủ", use_container_width=True):
+        if st.button("🏠 Quay lại Trang chủ", type="secondary", use_container_width=True):
             st.session_state.quiz_phase = "setup"
             st.session_state.user_answers = {}
             st.switch_page("app.py")
     with col2:
-        if st.button("📚 Làm bài khác", use_container_width=True):
+        if st.button("📚 Làm bài khác", type="primary", use_container_width=True):
             st.session_state.quiz_phase = "setup"
             st.session_state.user_answers = {}
             st.rerun()
