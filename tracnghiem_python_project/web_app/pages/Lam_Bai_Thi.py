@@ -194,7 +194,7 @@ def shuffle_options(options: dict):
 
 def save_quiz_attempt(student_id: int, subject_id: int, difficulty: str, score: int, total: int):
     try:
-        percent = round((score / total) * 100, 2) if total > 0 else 0.0
+        percent = round((score / total) * 10, 2) if total > 0 else 0.0
     except Exception:
         percent = 0.0
     diff_map = {"Dễ": "EASY", "Trung bình": "MEDIUM", "Khó": "HARD"}

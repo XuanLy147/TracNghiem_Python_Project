@@ -6,9 +6,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import tkinter as tk
 from ui.login_ui import show_login_window
-# from ui.student_ui import show_student_management
-# from ui.question_ui import show_question_management
-
+from ui.student_ui import show_student_management
+from ui.question_ui import show_question_management
+from ui.subject_ui import show_subject_management
 class AdminDashboard:
     def __init__(self, root, admin_info):
         self.root = root
@@ -37,9 +37,9 @@ class AdminDashboard:
         self.menu_buttons = []
 
         # Tạo các nút chức năng
+        self.btn_subjects = self.create_nav_button("🏷 Quản Lý Môn Học", self.show_subjects)
         self.btn_questions = self.create_nav_button("📚 Ngân Hàng Câu Hỏi", self.show_questions)
         self.btn_students = self.create_nav_button("👥 Quản Lý Học Viên", self.show_students)
-        self.btn_history = self.create_nav_button("📈 Thống Kê & Lịch Sử", self.show_history)
 
         # Nút đăng xuất ở đáy
         btn_logout = tk.Button(self.sidebar, text="🚪 Đăng Xuất", font=("Arial", 11, "bold"), 
@@ -72,7 +72,7 @@ class AdminDashboard:
         self.main_content.pack(side="top", fill="both", expand=True, padx=25, pady=25)
 
         # Bật trang mặc định khi vừa đăng nhập xong
-        self.show_questions()
+        self.show_subjects()
 
     # --- Các hàm hỗ trợ giao diện ---
     def create_nav_button(self, text, command):
@@ -105,22 +105,17 @@ class AdminDashboard:
             widget.destroy()
 
     # --- Logic chuyển trang ---
+    def show_subjects(self):
+        self.set_active_menu(self.btn_subjects, "Quản Lý Môn Học")
+        show_subject_management(self.main_content)
+
     def show_questions(self):
         self.set_active_menu(self.btn_questions, "Quản Lý Ngân Hàng Câu Hỏi")
-        # Thay dòng text dưới đây bằng: show_question_management(self.main_content)
-        tk.Label(self.main_content, text="[Giao diện CÂU HỎI sẽ được nạp vào đây]", 
-                 font=("Arial", 12), fg="#8A9BB0", bg="#F8F9FB").pack(expand=True)
+        show_question_management(self.main_content)
 
     def show_students(self):
         self.set_active_menu(self.btn_students, "Quản Lý Học Viên")
-        # Thay dòng text dưới đây bằng: show_student_management(self.main_content)
-        tk.Label(self.main_content, text="[Giao diện HỌC VIÊN sẽ được nạp vào đây]", 
-                 font=("Arial", 12), fg="#8A9BB0", bg="#F8F9FB").pack(expand=True)
-
-    def show_history(self):
-        self.set_active_menu(self.btn_history, "Thống Kê & Lịch Sử")
-        tk.Label(self.main_content, text="[Giao diện THỐNG KÊ sẽ được nạp vào đây]", 
-                 font=("Arial", 12), fg="#8A9BB0", bg="#F8F9FB").pack(expand=True)
+        show_student_management(self.main_content)
 
     def logout(self):
         self.root.destroy()

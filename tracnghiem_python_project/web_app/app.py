@@ -10,7 +10,6 @@ import os
 
 # Thêm thư mục gốc vào path để import shared
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import admin_app.utils.excel_handler as excel_handler
 from shared.db import fetch_data 
 
 # ===================== CẤU HÌNH TRANG =====================
@@ -159,10 +158,10 @@ def show_dashboard():
         
         if result and result[0]['total_attempts'] > 0:
             total_attempts = result[0]['total_attempts']
-            # Trong Lam_Bai_Thi.py, điểm (score) lưu theo thang 100 (%). Ta chia 10 để hiển thị thang điểm 10.
             raw_avg = result[0]['avg_score']
             if raw_avg is not None:
-                avg_score = round(float(raw_avg) / 10, 1)
+                avg = float(raw_avg)
+                avg_score = round(avg / 10, 1) if avg > 10 else round(avg, 1)
             total_subjects = result[0]['total_subjects']
     except Exception as e:
         # Bỏ qua lỗi nếu bảng quiz_attempts chưa tồn tại hoặc bị sai cấu trúc
@@ -230,36 +229,7 @@ def show_dashboard():
             if st.button("Xem Lịch Sử 🕒", key="btn_su", type="primary", use_container_width=True):
                 st.switch_page("pages/Lich_Su_Lam_Bai.py")
 
-        # --- 4. THÊM EXCEL ---
-        st.markdown('<div class="upload-zone">', unsafe_allow_html=True)
-        st.markdown("<h5 style='color: #475569; margin-bottom: 1rem;'>📂 Thêm câu hỏi từ file Excel</h5>", unsafe_allow_html=True)
-        
-        uploaded_file = st.file_uploader("Kéo thả hoặc chọn file (chỉ hỗ trợ .xls, .xlsx)", type=['xls', 'xlsx'], label_visibility="collapsed")
-        
-        if uploaded_file is not None:
-            col_space1, col_btn, col_space2 = st.columns([1, 2, 1])
-            with col_btn:
-                if st.button("🚀 Tiến hành thêm vào Database", use_container_width=True):
-                    with st.spinner("Đang thêm dữ liệu từ file Excel..."):
-                        try:
-                            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
-                                tmp.write(uploaded_file.getvalue())
-                                tmp_file_path = tmp.name
-                            
-                            success = excel_handler.import_questions_from_excel(tmp_file_path)
-                            
-                            if success:
-                                st.success("✅ Đã thêm câu hỏi vào Database thành công!")
-                            else:
-                                st.error("❌ Có lỗi xảy ra khi thêm câu hỏi. Vui lòng kiểm tra lại cấu trúc file Excel.")
-                                
-                        except Exception as e:
-                            st.error(f"❌ Lỗi hệ thống: {e}")
-                        
-                        finally:
-                            if 'tmp_file_path' in locals() and os.path.exists(tmp_file_path):
-                                os.remove(tmp_file_path)
-        st.markdown('</div>', unsafe_allow_html=True)
+        # (Đã di chuyển chức năng Thêm Excel sang Admin App)
 
 # ===================== TRANG ĐĂNG NHẬP =====================
 def show_login():

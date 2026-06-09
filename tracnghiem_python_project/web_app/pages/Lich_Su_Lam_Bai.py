@@ -59,6 +59,7 @@ def show_history():
 
     df = pd.DataFrame(history_data)
     df['Điểm số'] = pd.to_numeric(df['Điểm số'])
+    df['Điểm số'] = df['Điểm số'].apply(lambda x: x / 10 if x > 10 else x)
 
     # --- METRICS ---
     total_exams = len(df)
@@ -85,8 +86,8 @@ def show_history():
     ).encode(
         x=alt.X('Thời gian nộp bài:O', sort=None, title='Thời gian nộp bài'), # :O giữ nguyên thứ tự thời gian
         y=alt.Y('Điểm số:Q', 
-                scale=alt.Scale(domain=[0, 100]), # Ép cứng trục Y từ 0 đến 100
-                axis=alt.Axis(values=[0, 20, 40, 60, 80, 100]), # Chỉ hiện đúng các vạch số này
+                scale=alt.Scale(domain=[0, 10]), # Ép cứng trục Y từ 0 đến 10
+                axis=alt.Axis(values=[0, 2, 4, 6, 8, 10]), # Chỉ hiện đúng các vạch số này
                 title='Điểm số'
         )
     ).properties(
