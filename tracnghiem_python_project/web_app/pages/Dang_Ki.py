@@ -14,57 +14,70 @@ from shared.db import fetch_data, execute_query
 st.set_page_config(
     page_title="Đăng Ký — Hệ Thống Trắc Nghiệm",
     page_icon="📋",
-    layout="centered",
+    layout="wide", # Sử dụng layout wide để chia 2 cột giống trang Đăng nhập
     initial_sidebar_state="collapsed",
 )
 
-# ===================== CSS ĐỒNG BỘ VỚI APP.PY =====================
+# ===================== CSS ĐỒNG BỘ VỚI TRANG ĐĂNG NHẬP =====================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap');
 
 html, body, [class*="css"] { font-family: 'Be Vietnam Pro', sans-serif; }
 
-/* 1. MÀU NỀN ĐỒNG BỘ #4ECDC4 */
-.stApp { background: #4ECDC4; min-height: 100vh; }
+/* Nền tảng trang web sáng sủa, hiện đại */
+.stApp { background-color: #F8FAFC; }
 
+/* Ẩn các thành phần mặc định không cần thiết */
 #MainMenu, header, footer { visibility: hidden; }
-.block-container { padding-top: 2rem !important; }
-.hero-header { text-align: center; padding: 2rem 1rem 1.2rem; animation: fadeInDown 0.7s ease; }
-.hero-icon { font-size: 3rem; display: block; margin-bottom: 0.4rem; }
 
-/* 2. MÀU TIÊU ĐỀ ĐỎ #FF0000 */
-.hero-title { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; color: #FF0000; margin: 0; text-shadow: 1px 1px 3px rgba(255,255,255,0.7); }
-.hero-subtitle { font-size: 0.9rem; color: #e0f2fe; margin-top: 0.4rem; }
+/* Bảng điều khiển bên trái (Gradient) */
+.register-left-panel {
+    background: linear-gradient(135deg, #10b981 0%, #0ea5e9 100%); /* Màu xanh ngọc/biển tạo cảm giác mới mẻ cho trang đăng ký */
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    color: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 10px 25px rgba(14, 165, 233, 0.2);
+}
+.register-title { font-size: 2.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem; }
+.register-subtitle { font-size: 1.1rem; opacity: 0.9; line-height: 1.5; }
 
-/* 3. LÀM ĐẬM BO VIỀN CARD ĐĂNG KÝ (Dày 2px, viền trắng rõ nét) */
-.register-card { background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.7); border-radius: 20px; padding: 2rem 2rem; backdrop-filter: blur(12px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); animation: fadeInUp 0.7s ease 0.1s both; max-width: 460px; margin: 0 auto; }
-.card-title { font-size: 1.1rem; font-weight: 700; color: #ffffff; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; }
+/* Custom Inputs & Buttons */
+.stTextInput > div > div > input {
+    border: 2px solid #E2E8F0 !important; border-radius: 10px !important;
+    padding: 0.75rem 1rem !important; transition: all 0.2s ease; background: #FFFFFF !important;
+}
+.stTextInput > div > div > input:focus { border-color: #0EA5E9 !important; box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1) !important; }
+.stTextInput > label { color: #475569 !important; font-size: 0.85rem !important; font-weight: 600 !important; }
 
-/* 4. SỬA Ô NHẬP LIỆU: NỀN TRẮNG (#FFFFFF), CHỮ ĐEN (#000000), VIỀN ĐẬM (#94A3B8) */
-.stTextInput > div > div > input { background: #FFFFFF !important; border: 2px solid #94A3B8 !important; border-radius: 10px !important; color: #000000 !important; font-family: 'Be Vietnam Pro', sans-serif !important; font-size: 0.92rem !important; padding: 0.65rem 0.9rem !important; transition: border 0.25s, box-shadow 0.25s; }
-.stTextInput > div > div > input:focus { border-color: #0ea5e9 !important; box-shadow: 0 0 0 3px rgba(14,165,233,0.3) !important; }
-.stTextInput > label { color: #f8fafc !important; font-size: 0.82rem !important; font-weight: 600 !important; letter-spacing: 0.05em !important; text-transform: uppercase !important; text-shadow: 0px 1px 2px rgba(0,0,0,0.2); }
+/* Nút Đăng ký */
+.stButton > button {
+    width: 100%; background: #0EA5E9 !important; color: white !important;
+    border: none !important; border-radius: 10px !important; font-weight: 600 !important;
+    padding: 0.75rem 1rem !important; transition: all 0.2s !important;
+}
+.stButton > button:hover { background: #0284C7 !important; transform: translateY(-2px) !important; }
 
-/* Button Đăng ký */
-.stButton > button { width: 100%; background: linear-gradient(135deg, #10b981, #0ea5e9) !important; color: white !important; border: none !important; border-radius: 10px !important; font-family: 'Be Vietnam Pro', sans-serif !important; font-weight: 700 !important; font-size: 0.95rem !important; padding: 0.7rem 1.5rem !important; cursor: pointer !important; transition: opacity 0.2s, transform 0.15s !important; letter-spacing: 0.03em; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-.stButton > button:hover { opacity: 0.9 !important; transform: translateY(-2px) !important; box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+/* Nút Chuyển về Đăng nhập (nút phụ) */
+.btn-secondary > .stButton > button { background: #F1F5F9 !important; color: #475569 !important; }
+.btn-secondary > .stButton > button:hover { background: #E2E8F0 !important; color: #1E293B !important; }
 
-.divider { display: flex; align-items: center; gap: 0.8rem; margin: 1rem 0; color: #e0f2fe; font-size: 0.8rem; }
-.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.4); }
-
-.nav-link { text-align: center; margin-top: 1rem; font-size: 0.88rem; color: #f1f5f9; }
-.nav-link a { color: #0f172a; text-decoration: none; font-weight: 800; background: #ffffff; padding: 2px 8px; border-radius: 4px; }
-
-.rule-list { font-size: 0.8rem; color: #e0f2fe; line-height: 1.7; margin: 0; padding-left: 1.1rem; }
+.rule-list { font-size: 0.85rem; color: #64748B; line-height: 1.6; margin-top: 0.5rem; padding-left: 1.2rem; }
 .rule-list li { list-style: disc; }
 
-.success-box { background: rgba(52,211,153,0.2); border: 2px solid #34d399; border-radius: 12px; padding: 1.5rem; text-align: center; animation: fadeInUp 0.5s ease; }
-.success-icon { font-size: 2.5rem; }
-.success-text { color: #34d399; font-weight: 700; font-size: 1.1rem; margin-top: 0.5rem; text-shadow: 0px 1px 2px rgba(0,0,0,0.3); }
-.success-sub { color: #ffffff; font-size: 0.85rem; margin-top: 0.3rem; }
+/* Hộp thông báo thành công */
+.success-box { 
+    background: #DCFCE7; border: 2px solid #22C55E; border-radius: 16px; 
+    padding: 2rem; text-align: center; animation: fadeInUp 0.5s ease; 
+}
+.success-icon { font-size: 3rem; margin-bottom: 0.5rem;}
+.success-text { color: #15803D; font-weight: 800; font-size: 1.3rem; }
+.success-sub { color: #166534; font-size: 0.95rem; margin-top: 0.5rem; }
 
-@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 """, unsafe_allow_html=True)
@@ -97,86 +110,103 @@ if "new_student_name" not in st.session_state:
     st.session_state.new_student_name = ""
 
 
-# ===================== UI =====================
-st.markdown("""
-<div class="hero-header">
-    <span class="hero-icon">📋</span>
-    <h1 class="hero-title">Tạo Tài Khoản</h1>
-</div>
-""", unsafe_allow_html=True)
+# ===================== UI LAYOUT 2 CỘT =====================
+st.markdown("<div style='margin-top: 5vh;'></div>", unsafe_allow_html=True)
+spacer1, col_left, col_right, spacer2 = st.columns([1, 4, 3, 1], gap="large")
 
-if st.session_state.register_success:
-    st.markdown(f"""
-    <div class="success-box">
-        <div class="success-icon">🎉</div>
-        <div class="success-text">Đăng ký thành công!</div>
-        <div class="success-sub">Chào mừng <strong>{st.session_state.new_student_name}</strong> đến với hệ thống.</div>
+# --- CỘT TRÁI: THÔNG ĐIỆP CHÀO MỪNG ---
+with col_left:
+    st.markdown("""
+    <div class="register-left-panel">
+        <div class="register-title">Bắt Đầu<br>Hành Trình Mới</div>
+        <div class="register-subtitle">Tạo tài khoản ngay hôm nay để tham gia vào hệ thống ôn luyện và làm bài trắc nghiệm hiệu quả.</div>
     </div>
     """, unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("🔐 Đến trang Đăng nhập"):
-        st.session_state.register_success = False
-        st.switch_page("app.py")
-else:
-    st.markdown('<div class="card-title">✏️ Thông tin đăng ký</div>', unsafe_allow_html=True)
 
-    with st.form("register_form", clear_on_submit=False):
-        full_name = st.text_input("Họ và tên *", placeholder="Nguyễn Văn A")
-        username  = st.text_input("Tên đăng nhập *", placeholder="vd: hocsinh01")
-        email     = st.text_input("Email (không bắt buộc)", placeholder="email@example.com")
-        password  = st.text_input("Mật khẩu *", type="password", placeholder="Tối thiểu 6 ký tự")
-        password2 = st.text_input("Xác nhận mật khẩu *", type="password", placeholder="Nhập lại mật khẩu")
-
-        if password:
-            score, label, color = password_strength(password)
-            bar_width = [25, 50, 75, 100][score]
-            st.markdown(f"""
-            <div style="margin-bottom:6px;font-size:0.78rem;color:{color};font-weight:600;">
-                Độ mạnh mật khẩu: {label}
-            </div>
-            <div style="background:rgba(255,255,255,0.08);border-radius:3px;height:5px;margin-bottom:14px;">
-                <div style="width:{bar_width}%;height:5px;border-radius:3px;background:{color};transition:all 0.3s;"></div>
-            </div>
-            """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <ul class="rule-list">
-            <li>Tên đăng nhập: 4–20 ký tự, chỉ gồm chữ, số, gạch dưới</li>
-            <li>Mật khẩu: ít nhất 6 ký tự</li>
-        </ul>
+# --- CỘT PHẢI: KHU VỰC FORM ---
+with col_right:
+    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+    
+    # 1. NẾU ĐĂNG KÝ THÀNH CÔNG
+    if st.session_state.register_success:
+        st.markdown(f"""
+        <div class="success-box">
+            <div class="success-icon">🎉</div>
+            <div class="success-text">Đăng ký thành công!</div>
+            <div class="success-sub">Chào mừng <strong>{st.session_state.new_student_name}</strong> đến với hệ thống.</div>
+        </div>
         <br>
         """, unsafe_allow_html=True)
+        
+        st.markdown('<div class="btn-secondary">', unsafe_allow_html=True)
+        if st.button("🔐 Quay về trang Đăng nhập", use_container_width=True):
+            st.session_state.register_success = False
+            st.switch_page("app.py")
+        st.markdown('</div>', unsafe_allow_html=True)
 
-        submitted = st.form_submit_button("Đăng ký tài khoản →")
+    # 2. NẾU ĐANG Ở TRẠNG THÁI NHẬP FORM
+    else:
+        st.markdown("<h3 style='color: #1E293B; font-weight: 800; margin-bottom: 1rem;'>Tạo Tài Khoản</h3>", unsafe_allow_html=True)
 
-    if submitted:
-        errors = []
-        if not full_name.strip(): errors.append("Vui lòng nhập họ và tên.")
-        err_u = validate_username(username.strip())
-        if err_u: errors.append(err_u)
-        err_p = validate_password(password)
-        if err_p: errors.append(err_p)
-        if password != password2: errors.append("Hai mật khẩu không khớp nhau.")
+        with st.form("register_form", clear_on_submit=False):
+            full_name = st.text_input("Họ và tên *", placeholder="Nguyễn Văn A")
+            username  = st.text_input("Tên đăng nhập *", placeholder="vd: hocsinh01")
+            email     = st.text_input("Email (không bắt buộc)", placeholder="email@example.com")
+            password  = st.text_input("Mật khẩu *", type="password", placeholder="Tối thiểu 6 ký tự")
+            password2 = st.text_input("Xác nhận mật khẩu *", type="password", placeholder="Nhập lại mật khẩu")
 
-        if errors:
-            for e in errors: st.error(f"❌ {e}")
-        else:
-            with st.spinner("Đang xử lý..."):
-                check_user = fetch_data("SELECT student_id FROM students WHERE username = %s", (username.strip(),))
-                if len(check_user) > 0:
-                    st.error("❌ Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên khác.")
-                else:
-                    query = "INSERT INTO students (username, password_hash, full_name) VALUES (%s, %s, %s)"
-                    success = execute_query(query, (username.strip(), password, full_name.strip()))
-                    
-                    if success:
-                        st.session_state.register_success = True
-                        st.session_state.new_student_name = full_name.strip()
-                        st.rerun()
+            if password:
+                score, label, color = password_strength(password)
+                bar_width = [25, 50, 75, 100][score]
+                st.markdown(f"""
+                <div style="margin-bottom:6px;font-size:0.8rem;color:{color};font-weight:600;">
+                    Độ mạnh mật khẩu: {label}
+                </div>
+                <div style="background:#E2E8F0;border-radius:3px;height:5px;margin-bottom:14px;">
+                    <div style="width:{bar_width}%;height:5px;border-radius:3px;background:{color};transition:all 0.3s;"></div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            st.markdown("""
+            <ul class="rule-list">
+                <li>Tên đăng nhập: 4–20 ký tự (chữ, số, dấu gạch dưới).</li>
+                <li>Mật khẩu: Ít nhất 6 ký tự.</li>
+            </ul>
+            <br>
+            """, unsafe_allow_html=True)
+
+            submitted = st.form_submit_button("Đăng ký tài khoản →")
+
+        # Xử lý Logic Submit
+        if submitted:
+            errors = []
+            if not full_name.strip(): errors.append("Vui lòng nhập họ và tên.")
+            err_u = validate_username(username.strip())
+            if err_u: errors.append(err_u)
+            err_p = validate_password(password)
+            if err_p: errors.append(err_p)
+            if password != password2: errors.append("Hai mật khẩu không khớp nhau.")
+
+            if errors:
+                for e in errors: st.error(f"❌ {e}")
+            else:
+                with st.spinner("Đang xử lý..."):
+                    check_user = fetch_data("SELECT student_id FROM students WHERE username = %s", (username.strip(),))
+                    if len(check_user) > 0:
+                        st.error("❌ Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên khác.")
                     else:
-                        st.error("❌ Đã xảy ra lỗi khi tạo tài khoản. Vui lòng thử lại.")
+                        query = "INSERT INTO students (username, password_hash, full_name) VALUES (%s, %s, %s)"
+                        success = execute_query(query, (username.strip(), password, full_name.strip()))
+                        
+                        if success:
+                            st.session_state.register_success = True
+                            st.session_state.new_student_name = full_name.strip()
+                            st.rerun()
+                        else:
+                            st.error("❌ Đã xảy ra lỗi khi tạo tài khoản. Vui lòng thử lại.")
 
-    st.markdown('<div class="divider">hoặc</div>', unsafe_allow_html=True)
-    st.markdown('<div class="nav-link">Đã có tài khoản? <a href="/" target="_self">Đăng nhập ngay</a></div>', unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #64748B;">
+            Đã có tài khoản? <a href="/" target="_self" style="color: #0EA5E9; font-weight: 700; text-decoration: none;">Đăng nhập ngay</a>
+        </div>
+        """, unsafe_allow_html=True)
