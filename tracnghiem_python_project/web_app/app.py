@@ -4,74 +4,112 @@ Chạy bằng: streamlit run web_app/app.py
 """
 
 import streamlit as st
-import admin_app.utils.excel_handler as excel_handler
 import tempfile
 import sys
 import os
 
 # Thêm thư mục gốc vào path để import shared
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import admin_app.utils.excel_handler as excel_handler
 from shared.db import fetch_data 
 
 # ===================== CẤU HÌNH TRANG =====================
 st.set_page_config(
     page_title="Hệ Thống Trắc Nghiệm",
     page_icon="📝",
-    layout="centered",
-    initial_sidebar_state="expanded",
+    layout="wide", 
+    initial_sidebar_state="collapsed", 
 )
 
 # ===================== CSS CUSTOM =====================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap');
 
 html, body, [class*="css"] { font-family: 'Be Vietnam Pro', sans-serif; }
 
-/* MÀU NỀN TRANG WEB #4ECDC4 */
-.stApp { background: #4ECDC4; min-height: 100vh; }
+/* Nền tảng trang web sáng sủa, hiện đại */
+.stApp { background-color: #F8FAFC; }
 
+/* Ẩn các thành phần mặc định không cần thiết */
 #MainMenu, footer { visibility: hidden; }
 header { background-color: transparent !important; }
-.block-container { padding-top: 2rem !important; }
-.hero-header { text-align: center; padding: 2.5rem 1rem 1.5rem; animation: fadeInDown 0.7s ease; }
 
-/* MÀU CHỮ TIÊU ĐỀ #FF0000 */
-.hero-title { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 700; color: #FF0000; margin: 0; line-height: 1.2; text-shadow: 1px 1px 3px rgba(255,255,255,0.7); }
-.hero-subtitle { font-size: 0.95rem; color: #e0f2fe; margin-top: 0.5rem; letter-spacing: 0.04em; }
+/* === TRANG ĐĂNG NHẬP === */
+.login-left-panel {
+    background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    color: white;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+}
+.login-title { font-size: 2.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem; }
+.login-subtitle { font-size: 1.1rem; opacity: 0.9; line-height: 1.5; }
 
-/* 1. LÀM ĐẬM BO VIỀN FORM ĐĂNG NHẬP (Lên 2px và đậm hơn) */
-.login-card { background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.7); border-radius: 20px; padding: 2.2rem 2rem; backdrop-filter: blur(12px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); animation: fadeInUp 0.7s ease 0.15s both; max-width: 440px; margin: 0 auto; }
-.card-title { font-size: 1.15rem; font-weight: 700; color: #ffffff; margin-bottom: 1.4rem; display: flex; align-items: center; gap: 0.5rem; }
+/* === DASHBOARD === */
+/* Topbar */
+.topbar-container {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 1rem; border-bottom: 2px solid #E2E8F0; margin-bottom: 2rem;
+}
+.topbar-logo { font-size: 1.5rem; font-weight: 800; color: #4F46E5; margin: 0; }
+.topbar-user { font-weight: 600; color: #475569; display: flex; align-items: center; gap: 0.5rem; }
 
-/* 2. LÀM ĐẬM BO VIỀN Ô NHẬP LIỆU (Đổi sang xám đậm #94A3B8, dày 2px) */
-.stTextInput > div > div > input { background: #FFFFFF !important; border: 2px solid #94A3B8 !important; border-radius: 10px !important; color: #000000 !important; font-family: 'Be Vietnam Pro', sans-serif !important; font-size: 0.92rem !important; padding: 0.65rem 0.9rem !important; transition: border 0.25s, box-shadow 0.25s; }
-.stTextInput > div > div > input:focus { border-color: #0ea5e9 !important; box-shadow: 0 0 0 3px rgba(14,165,233,0.3) !important; outline: none !important; }
-.stTextInput > label { color: #f8fafc !important; font-size: 0.82rem !important; font-weight: 600 !important; letter-spacing: 0.05em !important; text-shadow: 0px 1px 2px rgba(0,0,0,0.2); }
+/* Banner Chào mừng */
+.welcome-banner {
+    background: linear-gradient(to right, #4F46E5, #0EA5E9);
+    border-radius: 16px; padding: 2rem; color: white; margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+}
+.welcome-name { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+.welcome-sub { font-size: 1rem; opacity: 0.9; }
 
-.stButton > button { width: 100%; background: linear-gradient(135deg, #0ea5e9, #6366f1) !important; color: white !important; border: none !important; border-radius: 10px !important; font-family: 'Be Vietnam Pro', sans-serif !important; font-weight: 700 !important; font-size: 0.95rem !important; padding: 0.7rem 1.5rem !important; cursor: pointer !important; transition: opacity 0.2s, transform 0.15s !important; letter-spacing: 0.03em; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-.stButton > button:hover { opacity: 0.9 !important; transform: translateY(-2px) !important; box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
-.stButton > button:active { transform: translateY(0px) !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-.stAlert { border-radius: 10px !important; font-family: 'Be Vietnam Pro', sans-serif !important; }
-.divider { display: flex; align-items: center; gap: 0.8rem; margin: 1rem 0; color: #e0f2fe; font-size: 0.8rem; }
-.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.4); }
-.nav-link { text-align: center; margin-top: 1rem; font-size: 0.88rem; color: #f1f5f9; }
-.nav-link a { color: #0f172a; text-decoration: none; font-weight: 800; background: #ffffff; padding: 2px 8px; border-radius: 4px; }
+/* Thống kê */
+.stat-container { background: rgba(255,255,255,0.2); border-radius: 12px; padding: 1rem; text-align: center; backdrop-filter: blur(4px); }
+.stat-num { font-size: 1.8rem; font-weight: 800; }
+.stat-label { font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.9; }
 
-/* CHỈNH LẠI BO VIỀN CHO CÁC THẺ Ở TRANG DASHBOARD */
-.welcome-banner { background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.6); border-radius: 16px; padding: 1.5rem 2rem; margin-bottom: 1.5rem; animation: fadeInDown 0.5s ease; backdrop-filter: blur(10px); }
-.welcome-name { font-size: 1.5rem; font-weight: 800; color: #ffffff; }
-.welcome-sub { color: #e0f2fe; font-size: 0.9rem; margin-top: 0.2rem; }
-.stat-card { background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.5); border-radius: 14px; padding: 1.2rem 1rem; text-align: center; backdrop-filter: blur(5px); }
-.stat-num { font-size: 2rem; font-weight: 800; color: #ffffff; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-.stat-label { font-size: 0.8rem; color: #e0f2fe; margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;}
-.menu-card { background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.5); border-radius: 14px; padding: 1.5rem 1.2rem; text-align: center; transition: background 0.2s, transform 0.2s; cursor: pointer; backdrop-filter: blur(5px); }
-.menu-card:hover { background: rgba(255,255,255,0.25); transform: translateY(-3px); }
-.menu-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-.menu-title { font-weight: 700; color: #ffffff; font-size: 0.95rem; }
-.menu-desc { color: #e0f2fe; font-size: 0.8rem; margin-top: 0.25rem; }
-@keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+/* Menu Cards (Đã được nâng cấp để làm nút bấm) */
+.menu-card {
+    background: #FFFFFF; border: 2px solid #E2E8F0; border-radius: 16px;
+    padding: 2.5rem 1.5rem; text-align: center; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: all 0.25s ease; height: 100%; cursor: pointer;
+}
+.menu-card:hover { 
+    transform: translateY(-5px); 
+    box-shadow: 0 15px 25px -5px rgba(79, 70, 229, 0.15); 
+    border-color: #4F46E5; 
+}
+.menu-icon { font-size: 3rem; margin-bottom: 1rem; transition: transform 0.2s; }
+.menu-card:hover .menu-icon { transform: scale(1.1); }
+.menu-title { font-weight: 800; color: #1E293B; font-size: 1.2rem; margin-bottom: 0.5rem; transition: color 0.2s; }
+.menu-card:hover .menu-title { color: #4F46E5; }
+.menu-desc { color: #64748B; font-size: 0.95rem; }
+
+/* Upload Vùng Nét Đứt */
+.upload-zone {
+    border: 2px dashed #94A3B8; border-radius: 16px; padding: 2rem;
+    background-color: #F8FAFC; text-align: center; margin-top: 2rem;
+}
+
+/* Custom Inputs & Buttons */
+.stTextInput > div > div > input {
+    border: 2px solid #E2E8F0 !important; border-radius: 10px !important;
+    padding: 0.75rem 1rem !important; transition: all 0.2s ease;
+}
+.stTextInput > div > div > input:focus { border-color: #4F46E5 !important; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important; }
+.stButton > button {
+    width: 100%; background: #4F46E5 !important; color: white !important;
+    border: none !important; border-radius: 10px !important; font-weight: 600 !important;
+    padding: 0.75rem 1rem !important; transition: all 0.2s !important;
+}
+.stButton > button:hover { background: #4338CA !important; transform: translateY(-2px) !important; }
+.stButton.logout-btn > button { background: #F1F5F9 !important; color: #475569 !important; padding: 0.4rem 0.8rem !important; border-radius: 8px !important; }
+.stButton.logout-btn > button:hover { background: #E2E8F0 !important; color: #EF4444 !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -98,107 +136,172 @@ if "student" not in st.session_state:
 
 
 # ===================== DASHBOARD (sau đăng nhập) =====================
+# ===================== DASHBOARD (sau đăng nhập) =====================
 def show_dashboard():
     student = st.session_state.student
+    student_id = student['student_id']
 
-    st.markdown(f"""
-    <div class="welcome-banner">
-        <div class="welcome-name">👋 Xin chào, {student['full_name']}!</div>
-        <div class="welcome-sub">Chào mừng bạn quay lại hệ thống trắc nghiệm.</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    c1, c2, c3 = st.columns(3)
-    with c1: st.markdown('<div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Lần thi</div></div>', unsafe_allow_html=True)
-    with c2: st.markdown('<div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Điểm TB</div></div>', unsafe_allow_html=True)
-    with c3: st.markdown('<div class="stat-card"><div class="stat-num">—</div><div class="stat-label">Môn học</div></div>', unsafe_allow_html=True)
-
-    st.markdown("<br><strong style='color:white;'>📌 Chức năng</strong>", unsafe_allow_html=True)
-
-    m1, m2, m3 = st.columns(3)
-    with m1:
-        st.markdown('<div class="menu-card"><div class="menu-icon">✍️</div><div class="menu-title">Làm Bài Thi</div><div class="menu-desc">Chọn môn & độ khó</div></div>', unsafe_allow_html=True)
-        if st.button("Vào Thi", key="btn_thi", use_container_width=True):
-            st.switch_page("pages/Lam_Bai_Thi.py")
-    with m2:
-        st.markdown('<div class="menu-card" style="margin-bottom: 10px;"><div class="menu-icon">📊</div><div class="menu-title">Lịch Sử Thi</div><div class="menu-desc">Xem kết quả các lần thi</div></div>', unsafe_allow_html=True)
-        if st.button("Xem Lịch Sử 🕒", key="btn_su", use_container_width=True):
-            st.switch_page("pages/Lich_Su_Lam_Bai.py")
-    with m3: st.markdown('<div class="menu-card"><div class="menu-icon">👤</div><div class="menu-title">Tài Khoản</div><div class="menu-desc">Thông tin cá nhân</div></div>', unsafe_allow_html=True)
-
-    # --- NÚT THÊM EXCEL ---
-    st.markdown("---")
-    st.markdown("<strong style='color:white;'>📂 Thêm câu hỏi từ file Excel</strong>", unsafe_allow_html=True)
+    # --- 0. TRUY VẤN DỮ LIỆU THỐNG KÊ TỪ DATABASE ---
+    total_attempts = 0
+    avg_score = 0.0
+    total_subjects = 0
     
-    uploaded_file = st.file_uploader("Vui lòng chọn file Excel", type=['xls', 'xlsx'])
+    try:
+        stats_query = """
+            SELECT 
+                COUNT(attempt_id) as total_attempts,
+                AVG(score) as avg_score,
+                COUNT(DISTINCT subject_id) as total_subjects
+            FROM quiz_attempts
+            WHERE student_id = %s
+        """
+        result = fetch_data(stats_query, (student_id,))
+        
+        if result and result[0]['total_attempts'] > 0:
+            total_attempts = result[0]['total_attempts']
+            # Trong Lam_Bai_Thi.py, điểm (score) lưu theo thang 100 (%). Ta chia 10 để hiển thị thang điểm 10.
+            raw_avg = result[0]['avg_score']
+            if raw_avg is not None:
+                avg_score = round(float(raw_avg) / 10, 1)
+            total_subjects = result[0]['total_subjects']
+    except Exception as e:
+        # Bỏ qua lỗi nếu bảng quiz_attempts chưa tồn tại hoặc bị sai cấu trúc
+        pass
+
+    # --- 1. TOPBAR ---
+    top1, top2, top3 = st.columns([5, 2, 1])
+    with top1:
+        st.markdown("<h2 class='topbar-logo'>Hệ Thống Trắc Nghiệm</h2>", unsafe_allow_html=True)
+    with top2:
+        st.markdown(f"<div class='topbar-user' style='justify-content: flex-end; margin-top: 10px;'>👤 {student['full_name']}</div>", unsafe_allow_html=True)
+    with top3:
+        st.markdown('<div class="logout-btn">', unsafe_allow_html=True)
+        if st.button("🚪 Đăng xuất", use_container_width=True):
+            st.session_state.logged_in = False
+            st.session_state.student = None
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    # Đưa nội dung vào khu vực hẹp hơn ở giữa
+    main_col1, main_content, main_col3 = st.columns([1, 8, 1])
     
-    if uploaded_file is not None:
-        if st.button("🚀 Tiến hành thêm vào Database", use_container_width=True):
-            with st.spinner("Đang thêm dữ liệu từ file Excel..."):
-                try:
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
-                        tmp.write(uploaded_file.getvalue())
-                        tmp_file_path = tmp.name
-                    
-                    success = excel_handler.import_questions_from_excel(tmp_file_path)
-                    
-                    if success:
-                        st.success("✅ Đã thêm câu hỏi vào Database thành công!")
-                    else:
-                        st.error("❌ Có lỗi xảy ra khi thêm câu hỏi. Vui lòng kiểm tra lại cấu trúc file Excel.")
+    with main_content:
+        # --- 2. BANNER & THỐNG KÊ (Đã truyền biến dữ liệu thật) ---
+        st.markdown(f"""
+        <div class="welcome-banner">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <div class="welcome-name">👋 Xin chào, {student['full_name']}!</div>
+                    <div class="welcome-sub">Chúc bạn có một phiên học tập hiệu quả hôm nay.</div>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <div class="stat-container"><div class="stat-num">{total_attempts}</div><div class="stat-label">Lần thi</div></div>
+                    <div class="stat-container"><div class="stat-num">{avg_score}</div><div class="stat-label">Điểm TB</div></div>
+                    <div class="stat-container"><div class="stat-num">{total_subjects}</div><div class="stat-label">Môn học</div></div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("<h4 style='color: #1E293B; margin-bottom: 1rem;'>📌 Chức Năng Của Bạn</h4>", unsafe_allow_html=True)
+
+        # --- 3. MENU CHỨC NĂNG ---
+        m1, m2 = st.columns(2, gap="large")
+        
+        with m1:
+            st.markdown("""
+                <div class="menu-card" style="margin-bottom: 15px; cursor: default;">
+                    <div class="menu-icon">✍️</div>
+                    <div class="menu-title">Làm Bài Thi</div>
+                    <div class="menu-desc">Chọn môn & độ khó để bắt đầu ngay</div>
+                </div>
+            """, unsafe_allow_html=True)
+            if st.button("Vào Thi 🚀", key="btn_thi", type="primary", use_container_width=True):
+                st.switch_page("pages/Lam_Bai_Thi.py")
+            
+        with m2:
+            st.markdown("""
+                <div class="menu-card" style="margin-bottom: 15px; cursor: default;">
+                    <div class="menu-icon">📊</div>
+                    <div class="menu-title">Lịch Sử Thi</div>
+                    <div class="menu-desc">Xem lại kết quả và đáp án các lần thi trước</div>
+                </div>
+            """, unsafe_allow_html=True)
+            if st.button("Xem Lịch Sử 🕒", key="btn_su", type="primary", use_container_width=True):
+                st.switch_page("pages/Lich_Su_Lam_Bai.py")
+
+        # --- 4. THÊM EXCEL ---
+        st.markdown('<div class="upload-zone">', unsafe_allow_html=True)
+        st.markdown("<h5 style='color: #475569; margin-bottom: 1rem;'>📂 Thêm câu hỏi từ file Excel</h5>", unsafe_allow_html=True)
+        
+        uploaded_file = st.file_uploader("Kéo thả hoặc chọn file (chỉ hỗ trợ .xls, .xlsx)", type=['xls', 'xlsx'], label_visibility="collapsed")
+        
+        if uploaded_file is not None:
+            col_space1, col_btn, col_space2 = st.columns([1, 2, 1])
+            with col_btn:
+                if st.button("🚀 Tiến hành thêm vào Database", use_container_width=True):
+                    with st.spinner("Đang thêm dữ liệu từ file Excel..."):
+                        try:
+                            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
+                                tmp.write(uploaded_file.getvalue())
+                                tmp_file_path = tmp.name
+                            
+                            success = excel_handler.import_questions_from_excel(tmp_file_path)
+                            
+                            if success:
+                                st.success("✅ Đã thêm câu hỏi vào Database thành công!")
+                            else:
+                                st.error("❌ Có lỗi xảy ra khi thêm câu hỏi. Vui lòng kiểm tra lại cấu trúc file Excel.")
+                                
+                        except Exception as e:
+                            st.error(f"❌ Lỗi hệ thống: {e}")
                         
-                except Exception as e:
-                    st.error(f"❌ Lỗi hệ thống: {e}")
-                
-                finally:
-                    if 'tmp_file_path' in locals() and os.path.exists(tmp_file_path):
-                        os.remove(tmp_file_path)
-    # ------------------------------
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.info("💡 Dùng thanh menu bên trái để điều hướng đến các trang.", icon="ℹ️")
-
-    if st.button("🚪 Đăng xuất"):
-        st.session_state.logged_in = False
-        st.session_state.student = None
-        st.rerun()
-
+                        finally:
+                            if 'tmp_file_path' in locals() and os.path.exists(tmp_file_path):
+                                os.remove(tmp_file_path)
+        st.markdown('</div>', unsafe_allow_html=True)
 
 # ===================== TRANG ĐĂNG NHẬP =====================
 def show_login():
-    st.markdown("""
-    <div class="hero-header">
-        <h1 class="hero-title">Hệ Thống Trắc Nghiệm</h1>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 5vh;'></div>", unsafe_allow_html=True)
+    spacer1, col_left, col_right, spacer2 = st.columns([1, 4, 3, 1], gap="large")
 
-    
-    with st.form("login_form", clear_on_submit=False):
-        username = st.text_input("Tên đăng nhập", placeholder="Nhập tên đăng nhập...")
-        password = st.text_input("Mật khẩu", type="password", placeholder="Nhập mật khẩu...")
-        submitted = st.form_submit_button("Đăng nhập →")
+    with col_left:
+        st.markdown("""
+        <div class="login-left-panel">
+            <div class="login-title">Hệ Thống<br>Trắc Nghiệm</div>
+            <div class="login-subtitle">Luyện tập thông minh, nâng cao kiến thức mỗi ngày. Đăng nhập để tiếp tục lộ trình học tập của bạn.</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    if submitted:
-        if not username or not password:
-            st.warning("⚠️ Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.")
-        else:
-            with st.spinner("Đang xác thực..."):
-                student = do_login(username.strip(), password.strip())
-            if student:
-                st.session_state.logged_in = True
-                st.session_state.student = student
-                st.success(f"✅ Chào mừng, {student['full_name']}!")
-                st.rerun()
+    with col_right:
+        st.markdown("<div style='margin-top: 20px;'></div>", unsafe_allow_html=True) 
+        st.markdown("<h3 style='color: #1E293B; font-weight: 800; margin-bottom: 1.5rem;'>Đăng nhập</h3>", unsafe_allow_html=True)
+        
+        with st.form("login_form", clear_on_submit=False):
+            username = st.text_input("Tên đăng nhập", placeholder="Nhập tên đăng nhập của bạn...")
+            password = st.text_input("Mật khẩu", type="password", placeholder="Nhập mật khẩu...")
+            st.markdown("<br>", unsafe_allow_html=True)
+            submitted = st.form_submit_button("Đăng nhập →")
+
+        if submitted:
+            if not username or not password:
+                st.warning("⚠️ Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.")
             else:
-                st.error("❌ Tên đăng nhập hoặc mật khẩu không đúng.")
+                with st.spinner("Đang xác thực..."):
+                    student = do_login(username.strip(), password.strip())
+                if student:
+                    st.session_state.logged_in = True
+                    st.session_state.student = student
+                    st.rerun()
+                else:
+                    st.error("❌ Tên đăng nhập hoặc mật khẩu không đúng.")
 
-    st.markdown('<div class="divider">hoặc</div>', unsafe_allow_html=True)
-    st.markdown("""
-    <div class="nav-link">
-        Chưa có tài khoản? <a href="/Dang_Ki" target="_self">Đăng ký ngay</a>
-    </div>
-    </div>
-    """, unsafe_allow_html=True)
+        st.markdown("""
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #64748B;">
+            Chưa có tài khoản? <a href="/Dang_Ki" target="_self" style="color: #4F46E5; font-weight: 700; text-decoration: none;">Đăng ký ngay</a>
+        </div>
+        """, unsafe_allow_html=True)
 
 # ===================== MAIN =====================
 if st.session_state.logged_in:
