@@ -386,10 +386,15 @@ elif st.session_state.quiz_phase == "taking":
                     continue
                 qid = questions[idx]['question_id']
                 is_current = (idx == current_idx)
+                is_pinned = qid in st.session_state.bookmarked_questions
                 is_answered = qid in st.session_state.user_answers
                 
                 btn_type = "primary" if is_current else "secondary"
                 btn_label = f"{idx + 1} ✅" if is_answered and not is_current else str(idx + 1)
+
+                button_label = f"{idx + 1}"
+                if is_pinned:
+                    button_label += " 📌"
                 
                 if cols[col_index].button(btn_label, key=f"q_nav_{idx}", type=btn_type, use_container_width=True):
                     st.session_state.current_question_index = idx
@@ -491,6 +496,8 @@ elif st.session_state.quiz_phase == "results":
         status_icon = "✅" if result["is_correct"] else "❌"
         status_text = "Đúng" if result["is_correct"] else "Sai"
         border_color = "#34d399" if result["is_correct"] else "#ef4444"
+        is_pinned = result["question_id"] in st.session_state.bookmarked_questions
+        pinned_label = "<span style='color: #b45309; font-weight: 700;'>📌 Đã ghim</span>" if is_pinned else ""
 
         st.markdown(f"""
         <div style="background: #ffffff; border: 2px solid #1d4ed8; border-left: 4px solid {border_color}; border-radius: 15px; padding: 1.5rem; margin: 1rem 0;">
