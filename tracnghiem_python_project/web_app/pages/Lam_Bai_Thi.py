@@ -174,14 +174,14 @@ def get_difficulty_levels():
 def get_questions(subject_id: int, difficulty: str, num_questions: int = 10):
     diff_map = {"Dễ": "EASY", "Trung bình": "MEDIUM", "Khó": "HARD"}
     db_diff = diff_map.get(difficulty, difficulty)
-    query = """
+    query = f"""
     SELECT question_id, question_content, option_a, option_b, option_c, option_d, correct_option
     FROM questions
     WHERE subject_id = %s AND difficulty_level = %s
     ORDER BY RAND()
-    LIMIT %s
+    LIMIT {int(num_questions)}
     """
-    result = fetch_data(query, (subject_id, db_diff, num_questions))
+    result = fetch_data(query, (subject_id, db_diff))
     return result if result else []
 
 def shuffle_options(options: dict):
