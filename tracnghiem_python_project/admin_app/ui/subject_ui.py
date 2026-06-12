@@ -100,7 +100,7 @@ def show_subject_management(parent):
     tk.Button(btn_frame, text="Thêm", bg="#28A745", fg="white", width=10, command=add_subject).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Sửa", bg="#FFC107", fg="black", width=10, command=update_subject).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Xóa", bg="#DC3545", fg="white", width=10, command=delete_subject).pack(side="left", padx=5)
-    tk.Button(btn_frame, text="Clear", bg="#6C757D", fg="white", width=10, command=clear_form).pack(side="left", padx=5)
+    tk.Button(btn_frame, text="Clear", bg="#0D2340", fg="white", width=10, command=clear_form).pack(side="left", padx=5)
     
     # Nút import riêng biệt
     tk.Button(btn_frame, text="📂 Import Câu Hỏi (Excel)", bg="#17A2B8", fg="white", width=25, command=import_excel).pack(side="left", padx=20)

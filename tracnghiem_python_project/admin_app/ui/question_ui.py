@@ -164,7 +164,7 @@ def show_question_management(parent):
     tk.Button(btn_frame, text="Thêm", bg="#28A745", fg="white", width=10, command=add_question).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Sửa", bg="#FFC107", fg="black", width=10, command=update_question).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Xóa", bg="#DC3545", fg="white", width=10, command=delete_question).pack(side="left", padx=5)
-    tk.Button(btn_frame, text="Clear", bg="#6C757D", fg="white", width=10, command=clear_form).pack(side="left", padx=5)
+    tk.Button(btn_frame, text="Clear", bg="#0D2340", fg="white", width=10, command=clear_form).pack(side="left", padx=5)
 
     # ==========================================
     # 2. BẢNG DANH SÁCH & LỌC
