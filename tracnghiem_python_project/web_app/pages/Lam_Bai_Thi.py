@@ -203,16 +203,7 @@ def save_quiz_attempt(student_id: int, subject_id: int, difficulty: str, score: 
     INSERT INTO quiz_attempts (student_id, subject_id, difficulty_level, total_questions, correct_answers, score, started_at)
     VALUES (%s, %s, %s, %s, %s, %s, NOW())
     """
-    return execute_query(query, (student_id, subject_id, db_diff, total, score, percent))
-
-def get_last_attempt_id(student_id: int, subject_id: int):
-    query = """
-    SELECT attempt_id FROM quiz_attempts
-    WHERE student_id = %s AND subject_id = %s
-    ORDER BY started_at DESC LIMIT 1
-    """
-    result = fetch_data(query, (student_id, subject_id))
-    return result[0]['attempt_id'] if result else None
+    return execute_query(query, (student_id, subject_id, db_diff, total, score, percent), return_lastrowid=True)
 
 def save_attempt_detail(attempt_id: int, question_id: int, selected_option: str, is_correct: bool):
     query = """
@@ -475,13 +466,11 @@ elif st.session_state.quiz_phase == "results":
         student_id = st.session_state.student['student_id']
         # KIỂM TRA Ổ KHÓA: Nếu chưa lưu (False) thì mới cho lưu
         if st.session_state.get('has_saved', False) == False:
-            attempt_saved = save_quiz_attempt(student_id, subject_id, difficulty, score, total_q)
-            if attempt_saved:
-                attempt_id = get_last_attempt_id(student_id, subject_id)
-                if attempt_id:
-                    for result in results_list:
-                        short_selected = str(result["selected"])[:250]
-                        save_attempt_detail(attempt_id, result["question_id"], short_selected, result["is_correct"])
+            attempt_id = save_quiz_attempt(student_id, subject_id, difficulty, score, total_q)
+            if attempt_id:
+                for result in results_list:
+                    short_selected = str(result["selected"])[:250]
+                    save_attempt_detail(attempt_id, result["question_id"], short_selected, result["is_correct"])
                 
                 # KHÓA LẠI: Đánh dấu là đã lưu rồi, cấm lưu thêm!
                 st.session_state.has_saved = True

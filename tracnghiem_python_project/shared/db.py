@@ -42,23 +42,26 @@ def fetch_data(query, params=None):
             cursor.close()
             connection.close()
 
-def execute_query(query, params=None):
+def execute_query(query, params=None, return_lastrowid=False):
     """
     Dùng cho các lệnh INSERT, UPDATE, DELETE.
     Trả về True nếu thành công, False nếu thất bại.
+    Nếu return_lastrowid=True, trả về ID của dòng vừa chèn (dùng cho AUTO_INCREMENT).
     """
     connection = get_connection()
     if connection is None:
-        return False
+        return False if not return_lastrowid else None
 
     try:
         cursor = connection.cursor()
         cursor.execute(query, params or ())
         connection.commit() # Bắt buộc phải commit thì dữ liệu mới lưu vào DB
+        if return_lastrowid:
+            return cursor.lastrowid
         return True
     except Error as e:
         print(f"Lỗi khi thực thi thao tác dữ liệu (Thêm/Sửa/Xóa): {e}")
-        return False
+        return False if not return_lastrowid else None
     finally:
         if connection.is_connected():
             cursor.close()

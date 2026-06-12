@@ -70,6 +70,8 @@ def show_student_management(parent):
             messagebox.showinfo("Thành công", "Đã thêm học viên mới!")
             clear_form()
             load_students()
+        else:
+            messagebox.showerror("Lỗi", "Thao tác thất bại! Có thể Username này đã tồn tại.")
 
     def update_student():
         s_id = var_id.get()
@@ -89,6 +91,8 @@ def show_student_management(parent):
             messagebox.showinfo("Thành công", "Cập nhật thành công!")
             clear_form()
             load_students()
+        else:
+            messagebox.showerror("Lỗi", "Cập nhật thất bại! Vui lòng kiểm tra lại thông tin.")
 
     def delete_student():
         s_id = var_id.get()
@@ -102,6 +106,8 @@ def show_student_management(parent):
                 messagebox.showinfo("Thành công", "Đã xóa học viên!")
                 clear_form()
                 load_students()
+            else:
+                messagebox.showerror("Lỗi", "Xóa thất bại! Vui lòng thử lại.")
 
     tk.Button(btn_frame, text="Thêm", bg="#28A745", fg="white", width=10, command=add_student).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Sửa", bg="#FFC107", fg="black", width=10, command=update_student).pack(side="left", padx=5)

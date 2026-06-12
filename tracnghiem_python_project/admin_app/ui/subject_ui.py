@@ -59,6 +59,8 @@ def show_subject_management(parent):
             messagebox.showinfo("Thành công", "Đã thêm môn học mới!")
             clear_form()
             load_subjects()
+        else:
+            messagebox.showerror("Lỗi", "Thao tác thất bại! Có thể Tên Môn Học đã tồn tại.")
 
     def update_subject():
         s_id = var_id.get()
@@ -72,6 +74,8 @@ def show_subject_management(parent):
             messagebox.showinfo("Thành công", "Cập nhật môn học thành công!")
             clear_form()
             load_subjects()
+        else:
+            messagebox.showerror("Lỗi", "Cập nhật thất bại! Vui lòng kiểm tra lại thông tin.")
 
     def delete_subject():
         s_id = var_id.get()
@@ -84,6 +88,8 @@ def show_subject_management(parent):
                 messagebox.showinfo("Thành công", "Đã xóa môn học!")
                 clear_form()
                 load_subjects()
+            else:
+                messagebox.showerror("Lỗi", "Xóa thất bại! Vui lòng thử lại.")
 
     def import_excel():
         file_path = filedialog.askopenfilename(

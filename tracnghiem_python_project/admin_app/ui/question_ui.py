@@ -127,6 +127,8 @@ def show_question_management(parent):
             messagebox.showinfo("Thành công", "Đã thêm câu hỏi!")
             clear_form()
             load_questions()
+        else:
+            messagebox.showerror("Lỗi", "Thêm câu hỏi thất bại! Vui lòng kiểm tra lại nội dung.")
 
     def update_question():
         q_id = var_qid.get()
@@ -147,6 +149,8 @@ def show_question_management(parent):
             messagebox.showinfo("Thành công", "Cập nhật thành công!")
             clear_form()
             load_questions()
+        else:
+            messagebox.showerror("Lỗi", "Cập nhật thất bại! Vui lòng kiểm tra lại thông tin.")
 
     def delete_question():
         q_id = var_qid.get()
@@ -160,6 +164,8 @@ def show_question_management(parent):
                 messagebox.showinfo("Thành công", "Đã xóa câu hỏi!")
                 clear_form()
                 load_questions()
+            else:
+                messagebox.showerror("Lỗi", "Xóa thất bại! Vui lòng thử lại.")
 
     tk.Button(btn_frame, text="Thêm", bg="#28A745", fg="white", width=10, command=add_question).pack(side="left", padx=5)
     tk.Button(btn_frame, text="Sửa", bg="#FFC107", fg="black", width=10, command=update_question).pack(side="left", padx=5)
