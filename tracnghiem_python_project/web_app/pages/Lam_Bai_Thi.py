@@ -47,6 +47,8 @@ html, body, [class*="css"] { font-family: 'Be Vietnam Pro', sans-serif; color: #
 .stApp { background: #ffffff; min-height: 100vh; color: #000000; }
 
 #MainMenu, header, footer { visibility: hidden; }
+[data-testid="collapsedControl"] {display: none;}
+section[data-testid="stSidebar"] {display: none;}
 .block-container { padding-top: 2rem !important; }
 .hero-header { text-align: center; padding: 2rem 1rem 1.2rem; animation: fadeInDown 0.7s ease; }
 .hero-icon { font-size: 3rem; display: block; margin-bottom: 0.4rem; }
@@ -258,23 +260,28 @@ if st.session_state.quiz_phase == "setup":
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        if st.button("🚀 Bắt Đầu Làm Bài", type="primary", use_container_width=True):
-            subject_id = subject_dict[selected_subject_name]
-            questions = get_questions(subject_id, selected_difficulty, num_questions)
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            if st.button("🏠 Quay về Trang chủ", type="secondary", use_container_width=True):
+                st.switch_page("app.py")
+        with col_btn2:
+            if st.button("🚀 Bắt Đầu Làm Bài", type="primary", use_container_width=True):
+                subject_id = subject_dict[selected_subject_name]
+                questions = get_questions(subject_id, selected_difficulty, num_questions)
 
-            if not questions:
-                st.error(f"❌ Không có câu hỏi nào cho môn '{selected_subject_name}' độ khó '{selected_difficulty}'.")
-            else:
-                st.session_state.selected_subject = (subject_id, selected_subject_name)
-                st.session_state.selected_difficulty = selected_difficulty
-                st.session_state.questions_list = questions
-                st.session_state.user_answers = {}
-                st.session_state.question_shuffled_map = {}
-                st.session_state.current_question_index = 0
-                st.session_state.bookmarked_questions = []
-                st.session_state.quiz_phase = "taking"
-                st.session_state.has_saved = False
-                st.rerun()
+                if not questions:
+                    st.error(f"❌ Không có câu hỏi nào cho môn '{selected_subject_name}' độ khó '{selected_difficulty}'.")
+                else:
+                    st.session_state.selected_subject = (subject_id, selected_subject_name)
+                    st.session_state.selected_difficulty = selected_difficulty
+                    st.session_state.questions_list = questions
+                    st.session_state.user_answers = {}
+                    st.session_state.question_shuffled_map = {}
+                    st.session_state.current_question_index = 0
+                    st.session_state.bookmarked_questions = []
+                    st.session_state.quiz_phase = "taking"
+                    st.session_state.has_saved = False
+                    st.rerun()
 
 
 elif st.session_state.quiz_phase == "taking":

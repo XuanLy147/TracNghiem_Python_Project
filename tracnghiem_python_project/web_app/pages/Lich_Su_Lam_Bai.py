@@ -11,7 +11,16 @@ except ImportError:
     sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
     from shared.db import fetch_data
 
-st.set_page_config(page_title="Lịch Sử Làm Bài", page_icon="🕒", layout="wide")
+st.set_page_config(page_title="Lịch Sử Làm Bài", page_icon="🕒", layout="wide", initial_sidebar_state="collapsed")
+
+st.markdown("""
+<style>
+#MainMenu {visibility: hidden;}
+header {visibility: hidden;}
+[data-testid="collapsedControl"] {display: none;}
+section[data-testid="stSidebar"] {display: none;}
+</style>
+""", unsafe_allow_html=True)
 
 def color_score(val):
     try:
@@ -29,6 +38,9 @@ def show_history():
 
     user_info = st.session_state.student
     student_id = user_info['student_id']
+
+    if st.button("🏠 Quay về Trang chủ", type="secondary"):
+        st.switch_page("app.py")
 
     st.markdown("""
     <div style="text-align: center; margin-bottom: 2rem;">

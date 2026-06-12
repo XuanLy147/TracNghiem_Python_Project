@@ -31,7 +31,7 @@ html, body, [class*="css"] { font-family: 'Be Vietnam Pro', sans-serif; }
 .stApp { background-color: #F8FAFC; }
 
 /* Ẩn các thành phần mặc định không cần thiết */
-#MainMenu, footer { visibility: hidden; }
+#MainMenu, header, footer { visibility: hidden; }
 header { background-color: transparent !important; }
 
 /* === TRANG ĐĂNG NHẬP === */
