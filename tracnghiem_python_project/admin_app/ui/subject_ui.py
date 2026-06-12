@@ -69,6 +69,10 @@ def show_subject_management(parent):
             return
         name = var_name.get().strip()
         desc = var_desc.get().strip()
+        
+        if not name:
+            messagebox.showwarning("Lỗi", "Vui lòng nhập tên môn học!")
+            return
         success = execute_query("UPDATE subjects SET subject_name=%s, description=%s WHERE subject_id=%s", (name, desc, s_id))
         if success:
             messagebox.showinfo("Thành công", "Cập nhật môn học thành công!")

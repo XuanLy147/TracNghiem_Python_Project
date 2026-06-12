@@ -83,6 +83,10 @@ def show_student_management(parent):
         password = var_password.get().strip()
         fullname = var_fullname.get().strip()
         
+        if not username or not password or not fullname:
+            messagebox.showwarning("Lỗi", "Vui lòng nhập đủ thông tin!")
+            return
+        
         success = execute_query(
             "UPDATE students SET username=%s, password_hash=%s, full_name=%s WHERE student_id=%s",
             (username, password, fullname, s_id)
