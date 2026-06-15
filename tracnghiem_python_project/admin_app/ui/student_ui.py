@@ -170,11 +170,7 @@ def show_student_management(parent):
         """
         history = fetch_data(query, (student_id,))
         for h in history:
-            score = float(h['score'])
-            if score > 10:
-                score = round(score / 10, 1)
-            else:
-                score = round(score, 1)
+            score = round(float(h['score']), 1)
                 
             tree_history.insert("", "end", values=(
                 h['subject_name'], 

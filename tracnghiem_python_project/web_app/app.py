@@ -161,7 +161,7 @@ def show_dashboard():
             raw_avg = result[0]['avg_score']
             if raw_avg is not None:
                 avg = float(raw_avg)
-                avg_score = round(avg / 10, 1) if avg > 10 else round(avg, 1)
+                avg_score = round(avg, 1)
             total_subjects = result[0]['total_subjects']
     except Exception as e:
         # Bỏ qua lỗi nếu bảng quiz_attempts chưa tồn tại hoặc bị sai cấu trúc

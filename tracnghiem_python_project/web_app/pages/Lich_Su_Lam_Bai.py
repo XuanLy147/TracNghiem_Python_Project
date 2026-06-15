@@ -71,7 +71,6 @@ def show_history():
 
     df = pd.DataFrame(history_data)
     df['Điểm số'] = pd.to_numeric(df['Điểm số'])
-    df['Điểm số'] = df['Điểm số'].apply(lambda x: x / 10 if x > 10 else x)
 
     # --- METRICS ---
     total_exams = len(df)
