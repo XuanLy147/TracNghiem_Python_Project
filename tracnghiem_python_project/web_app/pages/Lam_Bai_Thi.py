@@ -38,13 +38,45 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
+import base64
+def set_bg_hack(main_bg):
+    try:
+        ext = 'png' if main_bg.lower().endswith('.png') else 'jpeg'
+        with open(main_bg, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode()
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url(data:image/{ext};base64,{encoded_string});
+                background-size: cover;
+                background-position: center top;
+                background-attachment: fixed;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+    except:
+        pass
+
+# Cài đặt hình nền từ thư mục img
+img_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "img", "background2.jpg")
+set_bg_hack(img_path)
+
+if 'logged_in' not in st.session_state or not st.session_state.logged_in:
+    st.warning("⚠️ Vui lòng đăng nhập ở trang chủ để làm bài thi!")
+    if st.button("🏠 Quay về Trang chủ", type="primary"):
+        st.switch_page("app.py")
+    st.stop()
+
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap');
 
 html, body, [class*="css"] { font-family: 'Be Vietnam Pro', sans-serif; color: #000000; font-size: 1rem; }
 
-.stApp { background: #ffffff; min-height: 100vh; color: #000000; }
+.stApp { min-height: 100vh; color: #000000; }
 
 #MainMenu, header, footer { visibility: hidden; }
 [data-testid="collapsedControl"] {display: none;}
@@ -56,7 +88,6 @@ section[data-testid="stSidebar"] {display: none;}
 .hero-title { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; color: #FF0000; margin: 0; text-shadow: 1px 1px 3px rgba(255,255,255,0.7); }
 .hero-subtitle { font-size: 1rem; color: #0f172a; margin-top: 0.4rem; }
 
-.stSelectbox > div > div > input,
 .stTextInput > div > div > input { 
     background: #FFFFFF !important; 
     border: 2px solid #1d4ed8 !important; 
@@ -67,7 +98,6 @@ section[data-testid="stSidebar"] {display: none;}
     padding: 0.7rem 0.9rem !important; 
     transition: border 0.25s, box-shadow 0.25s; 
 }
-.stSelectbox > div > div > input:focus,
 .stTextInput > div > div > input:focus { 
     border-color: #1d4ed8 !important; 
     box-shadow: 0 0 0 3px rgba(29,78,216,0.2) !important; 
@@ -146,6 +176,17 @@ section[data-testid="stSidebar"] {display: none;}
     background: linear-gradient(90deg, #10b981, #0ea5e9); 
     height: 100%; 
     transition: width 0.3s ease;
+}
+
+/* FIX 1: Thêm background đục cho các container để chống "xuyên thấu" */
+div[data-testid="stVerticalBlockBorderWrapper"] {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* FIX 2: Ép padding nút bấm nhỏ lại để không rớt chữ ở bảng câu hỏi */
+div[data-testid="stVerticalBlock"] div.stButton > button { 
+    padding-left: 5px !important; 
+    padding-right: 5px !important; 
 }
 
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
@@ -298,7 +339,7 @@ elif st.session_state.quiz_phase == "taking":
     with header_col1:
         st.markdown(f"""
         <div style="padding: 1rem 0;">
-            <h1 style="font-family: 'Playfair Display', serif; color: #FF0000; font-size: 2rem; margin: 0; font-weight: 700;">Làm Bài Trắc Nghiệm</h1>
+            <h1 style="font-family: 'Playfair Display', serif; color: #2563eb; font-size: 2rem; margin: 0; font-weight: 700;">Làm Bài Trắc Nghiệm</h1>
         </div>
         """, unsafe_allow_html=True)
     
@@ -349,13 +390,14 @@ elif st.session_state.quiz_phase == "taking":
 
             current_answer = st.session_state.user_answers.get(question_id)
 
-            # FIX 2: Tự động đổi type của nút thành primary nếu đáp án đó đang được chọn
-            for opt_key, opt_text in shuffled_options:
-                btn_text = f"{opt_key}: {opt_text}"
-                btn_type = "primary" if current_answer == opt_key else "secondary"
+            # FIX 3: Trộn nội dung và gắn lại nhãn A, B, C, D chuẩn chỉ
+            labels = ["A", "B", "C", "D"]
+            for i, (orig_key, opt_text) in enumerate(shuffled_options):
+                btn_text = f"{labels[i]}: {opt_text}"
+                btn_type = "primary" if current_answer == orig_key else "secondary"
                 
-                if st.button(btn_text, key=f"ans_{question_id}_{opt_key}", type=btn_type, use_container_width=True):
-                    st.session_state.user_answers[question_id] = opt_key
+                if st.button(btn_text, key=f"ans_{question_id}_{i}", type=btn_type, use_container_width=True):
+                    st.session_state.user_answers[question_id] = orig_key
                     st.rerun()
 
             is_bookmarked = question_id in st.session_state.bookmarked_questions
@@ -388,11 +430,12 @@ elif st.session_state.quiz_phase == "taking":
                 is_answered = qid in st.session_state.user_answers
                 
                 btn_type = "primary" if is_current else "secondary"
-                btn_label = f"{idx + 1} ✅" if is_answered and not is_current else str(idx + 1)
-
-                button_label = f"{idx + 1}"
+                
+                btn_label = str(idx + 1)
                 if is_pinned:
-                    button_label += " 📌"
+                    btn_label += " 🚩"
+                if is_answered and not is_current:
+                    btn_label += " ✅"
                 
                 if cols[col_index].button(btn_label, key=f"q_nav_{idx}", type=btn_type, use_container_width=True):
                     st.session_state.current_question_index = idx
@@ -438,26 +481,38 @@ elif st.session_state.quiz_phase == "results":
     for question in questions:
         question_id = question['question_id']
         question_text = question['question_content']
-        correct_option = question['correct_option']
+        correct_original_letter = question['correct_option']
+        
+        options_dict = {
+            "A": question['option_a'],
+            "B": question['option_b'],
+            "C": question['option_c'],
+            "D": question['option_d']
+        }
+        correct_text = options_dict.get(correct_original_letter, "")
 
         if question_id in user_answers:
-            selected = user_answers[question_id]
-            is_correct = (selected == correct_option)
+            selected_orig_key = user_answers[question_id]
+            is_correct = (selected_orig_key == correct_original_letter)
+            selected_text = options_dict.get(selected_orig_key, "")
+            
             if is_correct:
                 score += 1
             results_list.append({
                 "question_id": question_id,
                 "question_text": question_text,
-                "selected": selected,
-                "correct": correct_option,
+                "selected_key": selected_orig_key,
+                "selected_text": selected_text,
+                "correct_text": correct_text,
                 "is_correct": is_correct
             })
         else:
             results_list.append({
                 "question_id": question_id,
                 "question_text": question_text,
-                "selected": "—",
-                "correct": correct_option,
+                "selected_key": "UNANSWERED",
+                "selected_text": "—",
+                "correct_text": correct_text,
                 "is_correct": False
             })
 
@@ -476,7 +531,7 @@ elif st.session_state.quiz_phase == "results":
             attempt_id = save_quiz_attempt(student_id, subject_id, difficulty, score, total_q)
             if attempt_id:
                 for result in results_list:
-                    short_selected = str(result["selected"])[:250]
+                    short_selected = str(result["selected_key"])[:250]
                     save_attempt_detail(attempt_id, result["question_id"], short_selected, result["is_correct"])
                 
                 # KHÓA LẠI: Đánh dấu là đã lưu rồi, cấm lưu thêm!
@@ -505,10 +560,10 @@ elif st.session_state.quiz_phase == "results":
                 <strong>Câu hỏi:</strong> {result['question_text']}
             </div>
             <div style="color: #0f172a; margin-bottom: 0.5rem;">
-                <strong>Bạn chọn:</strong> {result['selected']}
+                <strong>Bạn chọn:</strong> {result['selected_text']}
             </div>
             <div style="color: #0f172a; font-weight: 600;">
-                <strong>Đáp án đúng:</strong> {result['correct']}
+                <strong>Đáp án đúng:</strong> {result['correct_text']}
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -518,9 +573,15 @@ elif st.session_state.quiz_phase == "results":
         if st.button("🏠 Quay lại Trang chủ", type="secondary", use_container_width=True):
             st.session_state.quiz_phase = "setup"
             st.session_state.user_answers = {}
+            st.session_state.has_saved = False
+            st.session_state.question_shuffled_map = {}
+            st.session_state.bookmarked_questions = []
             st.switch_page("app.py")
     with col2:
         if st.button("📚 Làm bài khác", type="primary", use_container_width=True):
             st.session_state.quiz_phase = "setup"
             st.session_state.user_answers = {}
+            st.session_state.has_saved = False
+            st.session_state.question_shuffled_map = {}
+            st.session_state.bookmarked_questions = []
             st.rerun()

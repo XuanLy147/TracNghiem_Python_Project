@@ -20,6 +20,31 @@ st.set_page_config(
     initial_sidebar_state="collapsed", 
 )
 
+import base64
+def set_bg_hack(main_bg):
+    try:
+        ext = 'png' if main_bg.lower().endswith('.png') else 'jpeg'
+        with open(main_bg, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode()
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-image: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), url(data:image/{ext};base64,{encoded_string});
+                background-size: cover;
+                background-position: center top;
+                background-attachment: fixed;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+    except:
+        pass # Nếu không tìm thấy file ảnh thì bỏ qua
+
+# Cài đặt hình nền từ file bg_image.jpg nằm trong thư mục 'img' (ngang cấp với web_app)
+set_bg_hack(os.path.join(os.path.dirname(os.path.dirname(__file__)), "img", "background1.jpg"))
+
 # ===================== CSS CUSTOM =====================
 st.markdown("""
 <style>

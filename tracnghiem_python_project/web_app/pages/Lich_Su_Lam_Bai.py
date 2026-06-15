@@ -13,12 +13,44 @@ except ImportError:
 
 st.set_page_config(page_title="Lịch Sử Làm Bài", page_icon="🕒", layout="wide", initial_sidebar_state="collapsed")
 
+import base64
+def set_bg_hack(main_bg):
+    try:
+        ext = 'png' if main_bg.lower().endswith('.png') else 'jpeg'
+        with open(main_bg, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode()
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.85)), url(data:image/{ext};base64,{encoded_string});
+                background-size: cover;
+                background-position: center top;
+                background-attachment: fixed;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+    except:
+        pass
+
+img_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "img", "background3.jpg")
+set_bg_hack(img_path)
+
 st.markdown("""
 <style>
 #MainMenu {visibility: hidden;}
 header {visibility: hidden;}
 [data-testid="collapsedControl"] {display: none;}
 section[data-testid="stSidebar"] {display: none;}
+
+/* Làm trắng nền ô selectbox để khỏi bị chìm vào ảnh nền */
+div[data-baseweb="select"] > div {
+    background-color: #ffffff !important;
+    border: 2px solid #1d4ed8 !important;
+    border-radius: 8px !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -78,9 +110,27 @@ def show_history():
     max_score = df['Điểm số'].max()
 
     c1, c2, c3 = st.columns(3)
-    with c1: st.info(f"📚 **Tổng Lần Thi:**\n### {total_exams} lần")
-    with c2: st.warning(f"🎯 **Điểm Trung Bình:**\n### {avg_score} điểm")
-    with c3: st.success(f"🏆 **Điểm Cao Nhất:**\n### {max_score} điểm")
+    with c1: 
+        st.markdown(f"""
+        <div style="background-color: #eff6ff; padding: 1.2rem; border-radius: 0.8rem; border: 1px solid #bfdbfe; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="color: #1e3a8a; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">📚 Tổng Lần Thi:</div>
+            <div style="color: #1d4ed8; font-weight: 700; font-size: 2.2rem;">{total_exams} lần</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with c2: 
+        st.markdown(f"""
+        <div style="background-color: #fefce8; padding: 1.2rem; border-radius: 0.8rem; border: 1px solid #fef08a; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="color: #854d0e; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">🎯 Điểm Trung Bình:</div>
+            <div style="color: #a16207; font-weight: 700; font-size: 2.2rem;">{avg_score} điểm</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with c3: 
+        st.markdown(f"""
+        <div style="background-color: #f0fdf4; padding: 1.2rem; border-radius: 0.8rem; border: 1px solid #bbf7d0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="color: #166534; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">🏆 Điểm Cao Nhất:</div>
+            <div style="color: #15803d; font-weight: 700; font-size: 2.2rem;">{max_score} điểm</div>
+        </div>
+        """, unsafe_allow_html=True)
     st.divider()
 
     # --- CHART ---
@@ -177,11 +227,19 @@ def show_history():
                         'D': row['option_d']
                     }
                     correct_text = mapping.get(correct_letter, "Không xác định")
+                    
+                    selected_letter = row['selected_option']
+                    if selected_letter in mapping:
+                        selected_text = mapping[selected_letter]
+                    elif selected_letter == "UNANSWERED" or not selected_letter:
+                        selected_text = "—"
+                    else:
+                        selected_text = selected_letter
 
                     st.markdown(f"""
                     <div style="border-left: 4px solid {color}; padding-left: 15px; margin-bottom: 20px; background-color: #f8fafc; padding: 15px; border-radius: 5px;">
                         <p style="font-weight: bold; margin-bottom: 5px; color: #0f172a;">Câu {i+1}: {row['question_text']} {status_icon}</p>
-                        <p style="margin: 0; font-size: 0.95rem;"><b>Bạn chọn:</b> <span style="color: {color};">{row['selected_option']}</span></p>
+                        <p style="margin: 0; font-size: 0.95rem;"><b>Bạn chọn:</b> <span style="color: {color};">{selected_text}</span></p>
                         <p style="margin: 0; font-size: 0.95rem;"><b>Đáp án đúng:</b> <span style="color: #10b981;">{correct_text}</span></p>
                     </div>
                     """, unsafe_allow_html=True)
