@@ -134,6 +134,38 @@ header { background-color: transparent !important; }
 .stButton > button:hover { background: #4338CA !important; transform: translateY(-2px) !important; }
 .stButton.logout-btn > button { background: #F1F5F9 !important; color: #475569 !important; padding: 0.4rem 0.8rem !important; border-radius: 8px !important; }
 .stButton.logout-btn > button:hover { background: #E2E8F0 !important; color: #EF4444 !important; }
+
+/* ---- CUSTOM FOOTER STARTUP ---- */
+.startup-footer {
+    position: relative;
+    background: #ffffff;
+    border-top: 3px solid #2563eb;
+    border-radius: 12px 12px 0 0;
+    padding: 30px 20px 20px 20px;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    text-align: center;
+    margin-top: 25vh; /* Đẩy footer xuống xa một chút để người dùng phải lướt xuống mới thấy */
+}
+.footer-title {
+    color: #2563eb; /* Màu Indigo nhấn -> ĐIỂM NHẤN */
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+.footer-tagline {
+    color: #6b7280;
+    font-size: 0.85rem;
+    margin-bottom: 15px;
+}
+.footer-links {
+    color: #9ca3af;
+    font-size: 0.8rem;
+    margin-bottom: 0;
+}
+.footer-highlight {
+    color: #2563eb; /* Màu Indigo nhấn cho tên nhóm -> ĐIỂM NHẤN */
+    font-weight: 600;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -255,6 +287,19 @@ def show_dashboard():
                 st.switch_page("pages/Lich_Su_Lam_Bai.py")
 
         # (Đã di chuyển chức năng Thêm Excel sang Admin App)
+
+        # ---- FOOTER ĐƯỢC DESIGN LẠI ( WOW-FACTOR ) ----
+        st.markdown("""
+            <div class="startup-footer">
+                <div class="footer-title">EduQuest System</div>
+                <div class="footer-tagline">Hệ thống Quản lý và Hỗ trợ luyện thi trắc nghiệm trực tuyến.</div>
+                <div class="footer-links">
+                    © 2026 | Thiết kế & Phát triển bởi nhóm <span class="footer-highlight">Rắn Độc</span>.<br>
+                    <a href="https://youtu.be/dQw4w9WgXcQ?si=3smXtkiH5-f5ZdRd" target="_blank" style="color: #2563eb; text-decoration: underline; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='#1d4ed8'" onmouseout="this.style.color='#2563eb'">Về chúng tôi</a> | 
+                    <a href="https://youtu.be/dQw4w9WgXcQ?si=3smXtkiH5-f5ZdRd" target="_blank" style="color: #2563eb; text-decoration: underline; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='#1d4ed8'" onmouseout="this.style.color='#2563eb'">Liên hệ</a>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
 
 # ===================== TRANG ĐĂNG NHẬP =====================
 def show_login():
