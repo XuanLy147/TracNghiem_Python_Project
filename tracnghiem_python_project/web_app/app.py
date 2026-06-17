@@ -262,14 +262,14 @@ def show_dashboard():
         st.markdown("<h4 style='color: #1E293B; margin-bottom: 1rem;'>📌 Chức Năng Của Bạn</h4>", unsafe_allow_html=True)
 
         # --- 3. MENU CHỨC NĂNG ---
-        m1, m2 = st.columns(2, gap="large")
+        m1, m2, m3 = st.columns(3, gap="medium")
         
         with m1:
             st.markdown("""
                 <div class="menu-card" style="margin-bottom: 15px; cursor: default;">
                     <div class="menu-icon">✍️</div>
                     <div class="menu-title">Làm Bài Thi</div>
-                    <div class="menu-desc">Chọn môn & độ khó để bắt đầu ngay</div>
+                    <div class="menu-desc">Kiểm tra kiến thức với tính điểm</div>
                 </div>
             """, unsafe_allow_html=True)
             if st.button("Vào Thi 🚀", key="btn_thi", type="primary", use_container_width=True):
@@ -278,9 +278,20 @@ def show_dashboard():
         with m2:
             st.markdown("""
                 <div class="menu-card" style="margin-bottom: 15px; cursor: default;">
+                    <div class="menu-icon">📇</div>
+                    <div class="menu-title">Flashcard Ôn Tập</div>
+                    <div class="menu-desc">Học nhanh qua thẻ nhớ lật</div>
+                </div>
+            """, unsafe_allow_html=True)
+            if st.button("Học Từ Vựng 💡", key="btn_fc", type="primary", use_container_width=True):
+                st.switch_page("pages/On_Tap_Flashcard.py")
+
+        with m3:
+            st.markdown("""
+                <div class="menu-card" style="margin-bottom: 15px; cursor: default;">
                     <div class="menu-icon">📊</div>
                     <div class="menu-title">Lịch Sử Thi</div>
-                    <div class="menu-desc">Xem lại kết quả và đáp án các lần thi trước</div>
+                    <div class="menu-desc">Xem lại điểm & đáp án cũ</div>
                 </div>
             """, unsafe_allow_html=True)
             if st.button("Xem Lịch Sử 🕒", key="btn_su", type="primary", use_container_width=True):
