@@ -232,7 +232,7 @@ def show_dashboard():
         st.markdown(f"<div class='topbar-user' style='justify-content: flex-end; margin-top: 10px;'>👤 {student['full_name']}</div>", unsafe_allow_html=True)
     with top3:
         st.markdown('<div class="logout-btn">', unsafe_allow_html=True)
-        if st.button("🚪 Đăng xuất", use_container_width=True):
+        if st.button("Đăng xuất", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.student = None
             st.rerun()
@@ -259,7 +259,7 @@ def show_dashboard():
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("<h4 style='color: #1E293B; margin-bottom: 1rem;'>📌 Chức Năng Của Bạn</h4>", unsafe_allow_html=True)
+        st.markdown("<h4 style='color: #1E293B; margin-bottom: 1rem;'>Góc Học Tập Của Bạn</h4>", unsafe_allow_html=True)
 
         # --- 3. MENU CHỨC NĂNG ---
         m1, m2, m3 = st.columns(3, gap="medium")
@@ -272,7 +272,7 @@ def show_dashboard():
                     <div class="menu-desc">Kiểm tra kiến thức với tính điểm</div>
                 </div>
             """, unsafe_allow_html=True)
-            if st.button("Vào Thi 🚀", key="btn_thi", type="primary", use_container_width=True):
+            if st.button("Vào Thi", key="btn_thi", type="primary", use_container_width=True):
                 st.switch_page("pages/Lam_Bai_Thi.py")
             
         with m2:
@@ -283,7 +283,7 @@ def show_dashboard():
                     <div class="menu-desc">Học nhanh qua thẻ nhớ lật</div>
                 </div>
             """, unsafe_allow_html=True)
-            if st.button("Học Từ Vựng 💡", key="btn_fc", type="primary", use_container_width=True):
+            if st.button("Học Từ Vựng", key="btn_fc", type="primary", use_container_width=True):
                 st.switch_page("pages/On_Tap_Flashcard.py")
 
         with m3:
@@ -294,7 +294,7 @@ def show_dashboard():
                     <div class="menu-desc">Xem lại điểm & đáp án cũ</div>
                 </div>
             """, unsafe_allow_html=True)
-            if st.button("Xem Lịch Sử 🕒", key="btn_su", type="primary", use_container_width=True):
+            if st.button("Xem Lịch Sử", key="btn_su", type="primary", use_container_width=True):
                 st.switch_page("pages/Lich_Su_Lam_Bai.py")
 
         # (Đã di chuyển chức năng Thêm Excel sang Admin App)

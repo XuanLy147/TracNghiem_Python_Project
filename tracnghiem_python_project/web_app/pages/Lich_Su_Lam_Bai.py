@@ -71,7 +71,7 @@ def show_history():
     user_info = st.session_state.student
     student_id = user_info['student_id']
 
-    if st.button("🏠 Quay về Trang chủ", type="secondary"):
+    if st.button("Quay về Trang chủ", type="secondary"):
         st.switch_page("app.py")
 
     st.markdown("""
@@ -113,21 +113,21 @@ def show_history():
     with c1: 
         st.markdown(f"""
         <div style="background-color: #eff6ff; padding: 1.2rem; border-radius: 0.8rem; border: 1px solid #bfdbfe; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-            <div style="color: #1e3a8a; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">📚 Tổng Lần Thi:</div>
+            <div style="color: #1e3a8a; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">Tổng Lần Thi:</div>
             <div style="color: #1d4ed8; font-weight: 700; font-size: 2.2rem;">{total_exams} lần</div>
         </div>
         """, unsafe_allow_html=True)
     with c2: 
         st.markdown(f"""
         <div style="background-color: #fefce8; padding: 1.2rem; border-radius: 0.8rem; border: 1px solid #fef08a; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-            <div style="color: #854d0e; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">🎯 Điểm Trung Bình:</div>
+            <div style="color: #854d0e; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">Điểm Trung Bình:</div>
             <div style="color: #a16207; font-weight: 700; font-size: 2.2rem;">{avg_score} điểm</div>
         </div>
         """, unsafe_allow_html=True)
     with c3: 
         st.markdown(f"""
         <div style="background-color: #f0fdf4; padding: 1.2rem; border-radius: 0.8rem; border: 1px solid #bbf7d0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-            <div style="color: #166534; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">🏆 Điểm Cao Nhất:</div>
+            <div style="color: #166534; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">Điểm Cao Nhất:</div>
             <div style="color: #15803d; font-weight: 700; font-size: 2.2rem;">{max_score} điểm</div>
         </div>
         """, unsafe_allow_html=True)
