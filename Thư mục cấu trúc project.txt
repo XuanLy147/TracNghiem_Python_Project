@@ -1,12 +1,15 @@
-tracnghiem_python_project/ ( Cái này dùng streamlit để chạy web)
+tracnghiem_python_project------------------*
 │
 ├── database/                          # Quản lý cơ sở dữ liệu
-│   └── init_db.sql                    # Script tạo DB và 120 câu hỏi mẫu đã chốt
+│   └── init_db.sql                    # Script tạo DB và hơn 1000 câu hỏi mẫu
 │
 ├── shared/                            # Thư mục chứa mã nguồn dùng chung
 │   ├── __init__.py
 │   └── db.py                          # Logic kết nối MySQL (Admin và Web dùng chung để tránh trùng lặp)
 │
+│*********************************************************
+│ ------ Chạy bằng: python admin_app/main.py ---------
+│*********************************************************
 ├── admin_app/                         # ỨNG DỤNG LOCAL ĐỒ HỌA (Dành cho Admin)
 │   ├── main.py                        # File khởi chạy chính của ứng dụng Admin
 │   ├── ui/                            # Nơi thiết kế giao diện (Tkinter / CustomTkinter / PyQt)
@@ -18,12 +21,16 @@ tracnghiem_python_project/ ( Cái này dùng streamlit để chạy web)
 │       ├── __init__.py
 │       └── excel_handler.py           # Logic dùng pandas đọc file Excel (6 cột) để nạp vào DB
 │
+│*********************************************************
+│ ------ Chạy bằng: streamlit run web_app/app.py ---------
+│*********************************************************
 ├── web_app/                           # TRANG WEB HỆ THỐNG (Dành cho Học sinh bằng Streamlit)
 │   ├── app.py                         # File chạy chính (Đồng thời là trang Đăng nhập / Dashboard chính)
 │   └── pages/                         # Tính năng Multi-page (Nhiều trang) mặc định của Streamlit
 │       ├── Dang_Ki.py                 # Giao diện + Logic Đăng ký tài khoản học sinh
 │       ├── Lam_Bai_Thi.py             # Giao diện Chọn môn/Độ khó -> Làm bài -> Chấm điểm tô màu Xanh/Đỏ
 │       └── Lich_Su_Lam_Bai.py         # Giao diện Xem lại lịch sử các lượt thi của học sinh đó
+│       └── On_Tap_Flashcard.py        # Giao diện Chọn môn/Độ khó -> Hiển thị flashcard ( có thể lật ) và nút chuyển thẻ
 │
 ├── requirements.txt                   # Các thư viện cần cài đặt (pandas, streamlit, mysql-connector...)
 └── README.md                          # Hướng dẫn cách config DB và chạy các lệnh terminal
